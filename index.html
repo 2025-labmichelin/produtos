@@ -60,6 +60,7 @@
     .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
     .tag.ok{background:rgba(16,185,129,.1); color:#22c55e; border-color:rgba(16,185,129,.2)}
     .tag.warn{background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2)}
+    .tag.danger{background:rgba(239,68,68,.12); color:#ef4444; border-color:rgba(239,68,68,.3)}
     .hidden{display:none}
 
     .badge{display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:999px; font-size:11px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
@@ -96,12 +97,16 @@
         <div class="card"><div class="row"><span class="tag">Cards válidos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>
         <div class="card"><div class="row"><span class="tag">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>
       </div>
-      <p id="fileHelp" class="muted" style="margin-top:8px">Regras: exclui lista <b>Painel</b> e cards cujo <b>name</b> = nome da lista. Fora do fluxo: <b>Backlog</b>, <b>Suspenso</b>, <b>Cancelado</b>. Finalizados: <b>Concluído</b>, <b>Acompanha Resultados</b>.</p>
+      <p id="fileHelp" class="muted" style="margin-top:8px">
+  Regras: exclui lista Painel e cards cujo name = nome da lista.<br>
+  Fora do fluxo: Backlog, Suspenso, Cancelado.<br>
+  Finalizados: Concluído, Acompanha Resultados.
+</p>
     </section>
 
     <section class="card" aria-labelledby="membros-h2">
       <h2 id="membros-h2">Membros</h2>
-      <div class="muted">Nomes padronizados e em ordem alfabética.</div>
+      
       <div id="members" class="bars"></div>
     </section>
 
@@ -156,6 +161,8 @@ function normalizeMember(raw){if(!raw) return '—'; var key=String(raw).trim();
 function fmtPct(n){if(isNaN(n)||n==null) return '—'; var v=Math.round(n*1000)/10; return (v.toFixed(1).replace('.0',''))+'%';}
 function fmtDate(s){if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return '—'; var dd=String(d.getDate()).padStart(2,'0'); var mm=String(d.getMonth()+1).padStart(2,'0'); var yyyy=d.getFullYear(); return dd+'/'+mm+'/'+yyyy;}
 function tagForPUC(puc){var v=String(puc||'').toLowerCase(); if(v==='crítico'||v==='critico') return '<span class="tag warn">Crítico</span>'; if(v==='urgente') return '<span class="tag warn">Urgente</span>'; if(v==='prioridade') return '<span class="tag ok">Prioridade</span>'; return '<span class="tag">—</span>';}
+// Regra: atrasado = tem due no passado e não está finalizado nem fora do fluxo
+function isOverdue(c){ try{ if(!c||!c.due) return false; if(DONE_LIST_KEYS.has(c.listKey)||OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d=new Date(c.due); if(isNaN(d)) return false; var today=new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
 
 // ===== Config =====
 var ORDERED_ACTIVE_LABELS=[
@@ -211,15 +218,28 @@ function compute(cards){
   var byMember=new Map();
   cards.forEach(function(c){ var m=c.owner||'—'; byMember.set(m,(byMember.get(m)||0)+1); });
   var members=Array.from(byMember.entries()).map(function(e){return {name:e[0],count:e[1]};}).sort(function(a,b){return a.name.localeCompare(b.name);});
-  var sorted=cards.slice().sort(function(a,b){ var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0; if(aOut!==bOut) return aOut-bOut; var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap; });
-  return { totalValid:totalValid, doneCount:doneCount, byList:byList, members:members, sorted:sorted };
+  var sorted=cards.slice().sort(function(a,b){ var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0; if(aOut!==bOut) return aOut-bOut; // prioridade: em fluxo primeiro
+    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0; if(ao!==bo) return bo-ao; // atrasados antes dos demais
+    var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap; });
+  var today=new Date(); today.setHours(0,0,0,0);
+  var overdueCount=cards.filter(function(c){ return isOverdue(c); }).length;
+  return { totalValid:totalValid, doneCount:doneCount, overdueCount:overdueCount, byList:byList, members:members, sorted:sorted };
+}
+function renderKpis(m){
+  $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—';
+  $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
+  // cria card de atrasados se não existir
+  var oc=$('#kpi-overdue');
+  if(!oc){ var wrap=$('#kpis'); if(wrap){ var card=document.createElement('div'); card.className='card'; card.innerHTML='<div class="row"><span class="tag danger">Atrasados</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div>'; wrap.appendChild(card); oc=$('#kpi-overdue'); } }
+  if(oc){ $('#kpi-overdue').textContent=m.overdueCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueCount/m.totalValid):'—'; }
 }
 function renderKpis(m){ $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—'; $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—'; }
 function renderKanban(byList, total){ var wrap=$('#kanban'); wrap.innerHTML=''; ORDERED_ACTIVE_KEYS.forEach(function(key,idx){ var qty=byList.get(key)||0; var pct=total? (qty/total):0; var label=ORDERED_ACTIVE_LABELS[idx]; var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem'); el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>'; wrap.appendChild(el); }); }
 function renderMembers(members){ var wrap=$('#members'); wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
 
 var CURRENT_ROWS=[]; var FULL_ROWS=[]; var sortAsc=false;
-function renderProjects(rows){ CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML=''; rows.forEach(function(c){ var statusTag= OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' : (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' : '<span class="tag">Andamento</span>'); var prog=(c.progress==null)? '—' : fmtPct(c.progress); var tr=document.createElement('tr'); tr.innerHTML='<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td><td>'+(c.list||'—')+'</td><td>'+(c.owner||'—')+'</td><td>'+fmtDate(c.due)+'</td><td>'+tagForPUC(c.puc)+'</td><td class="right" style="font-weight:700">'+prog+'</td>'; tbody.appendChild(tr); }); $('#totalRows').textContent=rows.length; }
+function renderProjects(rows){ CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML=''; rows.forEach(function(c){ var overdue=isOverdue(c); var statusTag= OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' : (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' : (overdue? '<span class="tag danger">Atrasado</span>' : '<span class="tag">Andamento</span>'));
+    var prog=(c.progress==null)? '—' : fmtPct(c.progress); var tr=document.createElement('tr'); tr.innerHTML='<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td><td>'+(c.list||'—')+'</td><td>'+(c.owner||'—')+'</td><td>'+fmtDate(c.due)+'</td><td>'+tagForPUC(c.puc)+'</td><td class="right" style="font-weight:700">'+prog+'</td>'; tbody.appendChild(tr); }); $('#totalRows').textContent=rows.length; }
 function populateMemberFilter(members){ var sel=$('#memberFilter'); if(!sel) return; var current=sel.value; sel.innerHTML='<option value="">Todos</option>'+members.map(function(m){return '<option value="'+m.name+'">'+m.name+'</option>';}).join(''); if(current && Array.from(sel.options).some(function(o){return o.value===current;})) sel.value=current; }
 function applyTableFilters(){ var rows=FULL_ROWS.slice(); var q=($('#filterInput')&&$('#filterInput').value||'').trim().toLowerCase(); var who=($('#memberFilter')&&$('#memberFilter').value)||''; if(q){ rows=rows.filter(function(r){return (r.name||'').toLowerCase().indexOf(q)>-1;}); } if(who){ rows=rows.filter(function(r){return (r.owner||'')===who;}); } renderProjects(rows); }
 
