@@ -25,7 +25,7 @@
 
     .file-wrap{position:relative}
     input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
-    .file-label{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; background:var(--card); border:1px dashed var(--stroke); color:var(--muted)}
+    .file-label{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; background:var(--accent-2); color:#0b1220; border:none; font-weight:700; cursor:pointer}
 
     main{padding:22px; max-width:1400px; margin:0 auto}
     .grid{display:grid; gap:16px}
@@ -66,6 +66,7 @@
     .badge{display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:999px; font-size:11px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
     .badge.new{background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.3)}
     .overcap{color:#fca5a5}
+  .status-pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; background:#0e1725; border:1px solid var(--stroke); color:var(--muted)}
   </style>
 </head>
 <body>
@@ -76,12 +77,10 @@
     </div>
     <div class="actions" role="group" aria-label="Carregar dados">
       <div class="file-wrap">
-        <span id="fileLabel" class="file-label" aria-live="polite">Selecionar JSON do Trello</span>
+        <span id="fileLabel" class="file-label" aria-live="polite">Carregar JSON</span>
         <input id="fileInput" type="file" accept=".json,application/json" aria-describedby="fileHelp">
       </div>
-      <button id="btnFetchLocal" type="button" class="btn secondary" title="Tentar ler projetos.json da mesma pasta">Abrir projetos.json (pasta)</button>
-      <button id="btnDemo" type="button" class="btn" title="Carregar exemplo mínimo embutido">Carregar exemplo</button>
-      <button id="btnReset" type="button" class="btn secondary" title="Limpar dados e voltar ao estado inicial">Limpar</button>
+      <span id="hdrStatus" class="status-pill">Pronto</span>
     </div>
   </header>
 
@@ -116,23 +115,16 @@
     </section>
 
     <section class="card" style="grid-column:1 / -1" aria-labelledby="projetos-h2">
-      <div class="row"><h2 id="projetos-h2">Projetos (Progresso %)</h2><span class="muted">Ordenado por Progresso. Itens fora do fluxo no final.</span></div>
-      <div class="row" style="justify-content:space-between; align-items:center">
-        <div class="row" style="gap:12px; align-items:center">
-          <label class="muted">Filtro: <input id="filterInput" aria-label="Filtrar por nome do projeto" placeholder="Digite para filtrar" style="background:#0f1320; border:1px solid var(--stroke); color:var(--text); padding:6px 8px; border-radius:8px"></label>
-          <label class="muted">Membro:
-            <select id="memberFilter" aria-label="Filtrar por responsável" style="background:#0f1320; border:1px solid var(--stroke); color:var(--text); padding:6px 8px; border-radius:8px">
-              <option value="">Todos</option>
-            </select>
-          </label>
-        </div>
+      <div class="row"><h2 id="projetos-h2">Projetos (Progresso %)</h2></div>
+      <div class="row" style="justify-content:flex-end; align-items:center">
         <div class="muted">Total: <span id="totalRows">0</span></div>
       </div>
       <table id="projects">
         <thead>
           <tr>
-            <th>Projeto</th><th>Lista</th><th>Responsável</th><th>Entrega</th><th>PUC</th>
+            <th>Projeto</th><th>Lista</th><th>Responsável</th><th>Entrega</th><th>Entrega Final</th><th>PUC</th>
             <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar por progresso">Progresso ▲▼</th>
+            <th>Card</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -142,7 +134,7 @@
 
   <footer style="padding:18px 22px; border-top:1px solid var(--stroke); color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px">
     <span>Dashboard local – seus dados não saem do navegador.</span>
-    <span>Use "Carregar exemplo" para testar sem JSON.</span>
+    <span>Carregue um export JSON do Trello.</span>
   </footer>
 
 <script>
@@ -151,7 +143,10 @@
 function $(sel,root){return (root||document).querySelector(sel);} 
 function $$(sel,root){return Array.from((root||document).querySelectorAll(sel));}
 function logd(){var s=Array.from(arguments).map(function(x){try{return typeof x==='string'?x:JSON.stringify(x);}catch(_){return String(x);}}).join(' '); var el=$('#dbgLog'); if(el){el.textContent+=s+'\n'; el.scrollTop=el.scrollHeight;} if(window.console&&console.debug){console.debug('[DBG]',s);} }
-function setMsg(t){var el=$('#msg'); if(el){el.textContent=t;}}
+function setMsg(t){
+  var el = $('#msg'); if(el){ el.textContent = t; }
+  var hs = $('#hdrStatus'); if(hs){ hs.textContent = t; }
+}
 
 function stripAccents(s){return s? s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
 function norm(s){s=String(s||'').trim(); s=s.replace(/\s+/g,' '); var k=stripAccents(s).toLowerCase(); if(k==='acompanha resultado'||k==='acompanha resultados') return 'acompanha resultados'; if(k==='concluido'||k==='concluído') return 'concluido'; if(k==='painel') return 'painel'; if(k==='backlog') return 'backlog'; if(k==='suspenso') return 'suspenso'; if(k==='cancelado') return 'cancelado'; return k;}
@@ -163,6 +158,18 @@ function fmtDate(s){if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return 
 function tagForPUC(puc){var v=String(puc||'').toLowerCase(); if(v==='crítico'||v==='critico') return '<span class="tag warn">Crítico</span>'; if(v==='urgente') return '<span class="tag warn">Urgente</span>'; if(v==='prioridade') return '<span class="tag ok">Prioridade</span>'; return '<span class="tag">—</span>';}
 // Regra: atrasado = tem due no passado e não está finalizado nem fora do fluxo
 function isOverdue(c){ try{ if(!c||!c.due) return false; if(DONE_LIST_KEYS.has(c.listKey)||OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d=new Date(c.due); if(isNaN(d)) return false; var today=new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
+// Regra: atrasado (final) = possui finalDue no passado e não está finalizado
+function isFinalOverdue(c){
+  try{
+    if(!c || !c.finalDue) return false;
+    if (DONE_LIST_KEYS.has(c.listKey) || OUT_OF_FLOW_KEYS.has(c.listKey)) return false;
+    var d = new Date(c.finalDue);
+    if (isNaN(d)) return false;
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    return d < today;
+  }catch(_){ return false; }
+}
 
 // ===== Config =====
 var ORDERED_ACTIVE_LABELS=[
@@ -187,20 +194,56 @@ var MEMBER_MAP=new Map([
 var CONFIG={aliases:{},teams:{},capacity:{}};
 (function(){ try{ if(/^https?:/i.test(location.protocol)){ fetch('./members.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) return null; return r.json(); }).then(function(j){ if(!j) return; CONFIG.aliases=j.aliases||{}; CONFIG.teams=j.teams||{}; CONFIG.capacity=j.capacity||{}; Object.keys(CONFIG.aliases).forEach(function(alias){ MEMBER_MAP.set(alias, CONFIG.aliases[alias]); }); setMsg('Config de membros carregada'); }).catch(function(){/* ignora */}); } }catch(_){/* ignora */} })();
 
+// Util: extrai primeira data válida de um texto (DD/MM/AAAA ou AAAA-MM-DD)
+function parseDateFromText(text){
+  try{
+    if(!text) return null; var s=String(text).trim();
+    var parts = s.split(' ');
+    for(var i=0;i<parts.length;i++){
+      var t = parts[i]; if(!t) continue;
+      if(t.indexOf('/')>-1){ var a=t.split('/'); if(a.length===3){ var d=parseInt(a[0],10), mo=parseInt(a[1],10)-1, y=parseInt(a[2],10); var dt=new Date(y,mo,d); if(!isNaN(dt)) return dt; } }
+      if(t.indexOf('-')>-1){ var b=t.split('-'); if(b.length===3){ var y2=parseInt(b[0],10), mo2=parseInt(b[1],10)-1, d2=parseInt(b[2],10); var dt2=new Date(y2,mo2,d2); if(!isNaN(dt2)) return dt2; } }
+    }
+    return null;
+  }catch(_){ return null; }
+}
+
 // ===== Parse Trello JSON =====
 function ingestTrello(raw){
   var listsById=new Map();
   var membersById=new Map();
   var checklistsByCard=new Map();
+  var finalDueByCard=new Map();
   var cards=[];
 
   if(Array.isArray(raw.cards)&&Array.isArray(raw.lists)){
     raw.lists.forEach(function(l){ listsById.set(l.id,{id:l.id,name:String(l.name||'').trim(),closed:!!l.closed}); });
     if(Array.isArray(raw.members)) raw.members.forEach(function(m){ var name=m.fullName||m.username||m.name||''; membersById.set(m.id, normalizeMember(name)); });
-    if(Array.isArray(raw.checklists)) raw.checklists.forEach(function(cl){ var items=Array.isArray(cl.checkItems)?cl.checkItems:[]; var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length; var total=items.length; var cur=checklistsByCard.get(cl.idCard)||{done:0,total:0}; checklistsByCard.set(cl.idCard,{done:cur.done+done,total:cur.total+total}); });
-    cards=(raw.cards||[]).filter(function(c){return !c.closed;}).map(function(c){ var list=listsById.get(c.idList); var listName=list?list.name:(c.listName||''); var listKey=norm(listName); var puc=null; if(Array.isArray(c.labels)){ var names=c.labels.map(function(l){return (l.name||'').toLowerCase();}); if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico'; else if(names.indexOf('urgente')>-1) puc='Urgente'; else if(names.indexOf('prioridade')>-1) puc='Prioridade'; } else if(typeof c.puc==='string'){ puc=c.puc; } var owner='—'; if(Array.isArray(c.idMembers)&&c.idMembers.length){ var m=membersById.get(c.idMembers[0]); if(m) owner=m; } else if(c.member){ owner=normalizeMember(c.member);} var agg=checklistsByCard.get(c.id)||{done:0,total:0}; var progress=agg.total>0? (agg.done/agg.total):null; return { id:c.id, name:String(c.name||'').trim(), list:listName, listKey:listKey, due:c.due||c.dueDate||c.dataEntrega||null, owner:owner, puc:puc, progress:progress }; });
+    if(Array.isArray(raw.checklists)) raw.checklists.forEach(function(cl){
+      var items=Array.isArray(cl.checkItems)?cl.checkItems:[];
+      // progresso agregado por card
+      var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length;
+      var total=items.length; var cur=checklistsByCard.get(cl.idCard)||{done:0,total:0};
+      checklistsByCard.set(cl.idCard,{done:cur.done+done,total:cur.total+total});
+      // extrair "Data de Entrega" (usa a MAIOR data válida entre os itens)
+      var clKey=norm(cl.name||'');
+      if(clKey.indexOf('data de entrega')>-1){
+        var best=null;
+        items.forEach(function(it){ var d=parseDateFromText(it && it.name); if(d){ if(!best || d>best) best=d; } });
+        if(best) finalDueByCard.set(cl.idCard, best.toISOString());
+      }
+    });
+    cards=(raw.cards||[]).filter(function(c){return !c.closed;}).map(function(c){
+      var list=listsById.get(c.idList); var listName=list?list.name:(c.listName||''); var listKey=norm(listName);
+      var puc=null; if(Array.isArray(c.labels)){ var names=c.labels.map(function(l){return (l.name||'').toLowerCase();}); if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico'; else if(names.indexOf('urgente')>-1) puc='Urgente'; else if(names.indexOf('prioridade')>-1) puc='Prioridade'; } else if(typeof c.puc==='string'){ puc=c.puc; }
+      var owner='—'; if(Array.isArray(c.idMembers)&&c.idMembers.length){ var m=membersById.get(c.idMembers[0]); if(m) owner=m; } else if(c.member){ owner=normalizeMember(c.member);} 
+      var agg=checklistsByCard.get(c.id)||{done:0,total:0}; var progress=agg.total>0? (agg.done/agg.total):null;
+      var finalDue=finalDueByCard.get(c.id)||null;
+      var url=c.url || (c.shortLink? ('https://trello.com/c/'+c.shortLink): null);
+      return { id:c.id, name:String(c.name||'').trim(), list:listName, listKey:listKey, due:c.due||c.dueDate||c.dataEntrega||null, finalDue:finalDue, owner:owner, puc:puc, progress:progress, url:url };
+    });
   } else if(Array.isArray(raw)){
-    cards=raw.map(function(c){ var listName=(c.list||c.lista||'').trim(); return { id:c.id||c.cardId||Math.random().toString(36).slice(2), name:(c.name||c.card||'').trim(), list:listName, listKey:norm(listName), due:c.due||c.dueDate||c.dataEntrega||null, owner:normalizeMember(c.owner||c.responsavel||c.member||''), puc:c.puc||c.PUC||null, progress:(typeof c.progressPct==='number')?(c.progressPct/100): (typeof c.progress==='number')?c.progress:null }; });
+    cards=raw.map(function(c){ var listName=(c.list||c.lista||'').trim(); return { id:c.id||c.cardId||Math.random().toString(36).slice(2), name:(c.name||c.card||'').trim(), list:listName, listKey:norm(listName), due:c.due||c.dueDate||c.dataEntrega||null, finalDue:c.finalDue||null, owner:normalizeMember(c.owner||c.responsavel||c.member||''), puc:c.puc||c.PUC||null, progress:(typeof c.progressPct==='number')?(c.progressPct/100): (typeof c.progress==='number')?c.progress:null, url:c.url||null }; });
   } else { throw new Error('Formato de JSON não reconhecido.'); }
 
   // filtros
@@ -218,28 +261,56 @@ function compute(cards){
   var byMember=new Map();
   cards.forEach(function(c){ var m=c.owner||'—'; byMember.set(m,(byMember.get(m)||0)+1); });
   var members=Array.from(byMember.entries()).map(function(e){return {name:e[0],count:e[1]};}).sort(function(a,b){return a.name.localeCompare(b.name);});
-  var sorted=cards.slice().sort(function(a,b){ var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0; if(aOut!==bOut) return aOut-bOut; // prioridade: em fluxo primeiro
-    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0; if(ao!==bo) return bo-ao; // atrasados antes dos demais
-    var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap; });
-  var today=new Date(); today.setHours(0,0,0,0);
-  var overdueCount=cards.filter(function(c){ return isOverdue(c); }).length;
-  return { totalValid:totalValid, doneCount:doneCount, overdueCount:overdueCount, byList:byList, members:members, sorted:sorted };
+  var sorted=cards.slice().sort(function(a,b){
+    var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0;
+    if(aOut!==bOut) return aOut-bOut; // em fluxo primeiro
+    var afo=isFinalOverdue(a)?1:0, bfo=isFinalOverdue(b)?1:0; if(afo!==bfo) return bfo-afo; // final atrasado primeiro
+    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0; if(ao!==bo) return bo-ao; // depois atrasados de etapa
+    var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap;
+  });
+  var overdueFinalCount=cards.filter(function(c){ return isFinalOverdue(c); }).length;
+  var overdueStageCount=cards.filter(function(c){ return isOverdue(c); }).length;
+  return { totalValid:totalValid, doneCount:doneCount, overdueFinalCount:overdueFinalCount, overdueStageCount:overdueStageCount, byList:byList, members:members, sorted:sorted };
 }
 function renderKpis(m){
   $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—';
   $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
-  // cria card de atrasados se não existir
-  var oc=$('#kpi-overdue');
-  if(!oc){ var wrap=$('#kpis'); if(wrap){ var card=document.createElement('div'); card.className='card'; card.innerHTML='<div class="row"><span class="tag danger">Atrasados</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div>'; wrap.appendChild(card); oc=$('#kpi-overdue'); } }
-  if(oc){ $('#kpi-overdue').textContent=m.overdueCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueCount/m.totalValid):'—'; }
+  // KPI Atrasados (Kaban)
+  var ocS=$('#kpi-overdue');
+  if(!ocS){ var wrapS=$('#kpis'); if(wrapS){ var cardS=document.createElement('div'); cardS.className='card'; cardS.innerHTML='<div class="row"><span class="tag danger">Atrasados (Kaban)</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div>'; wrapS.appendChild(cardS); ocS=$('#kpi-overdue'); } }
+  if(ocS){ $('#kpi-overdue').textContent=m.overdueStageCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—'; }
+  // KPI Atrasados (final)
+  var ocF=$('#kpi-overdue-final');
+  if(!ocF){ var wrapF=$('#kpis'); if(wrapF){ var cardF=document.createElement('div'); cardF.className='card'; cardF.innerHTML='<div class="row"><span class="tag danger">Atrasados (final)</span></div><div class="kpi"><span class="big" id="kpi-overdue-final">–</span><span class="muted" id="kpi-overdue-final-pct">–</span></div>'; wrapF.appendChild(cardF); ocF=$('#kpi-overdue-final'); } }
+  if(ocF){ $('#kpi-overdue-final').textContent=m.overdueFinalCount; $('#kpi-overdue-final-pct').textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—'; }
 }
-function renderKpis(m){ $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—'; $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—'; }
 function renderKanban(byList, total){ var wrap=$('#kanban'); wrap.innerHTML=''; ORDERED_ACTIVE_KEYS.forEach(function(key,idx){ var qty=byList.get(key)||0; var pct=total? (qty/total):0; var label=ORDERED_ACTIVE_LABELS[idx]; var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem'); el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>'; wrap.appendChild(el); }); }
 function renderMembers(members){ var wrap=$('#members'); wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
 
 var CURRENT_ROWS=[]; var FULL_ROWS=[]; var sortAsc=false;
-function renderProjects(rows){ CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML=''; rows.forEach(function(c){ var overdue=isOverdue(c); var statusTag= OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' : (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' : (overdue? '<span class="tag danger">Atrasado</span>' : '<span class="tag">Andamento</span>'));
-    var prog=(c.progress==null)? '—' : fmtPct(c.progress); var tr=document.createElement('tr'); tr.innerHTML='<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td><td>'+(c.list||'—')+'</td><td>'+(c.owner||'—')+'</td><td>'+fmtDate(c.due)+'</td><td>'+tagForPUC(c.puc)+'</td><td class="right" style="font-weight:700">'+prog+'</td>'; tbody.appendChild(tr); }); $('#totalRows').textContent=rows.length; }
+function renderProjects(rows){
+  CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML='';
+  rows.forEach(function(c){
+    var overdueFinal=isFinalOverdue(c); var overdueStage=isOverdue(c);
+    var statusTag = OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' :
+                    (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' :
+                      (overdueFinal? '<span class="tag danger">Atrasado (final)</span>' : (overdueStage? '<span class="tag danger">Atrasado</span>' : '<span class="tag">Andamento</span>')));
+    var prog=(c.progress==null)? '—' : fmtPct(c.progress);
+    var linkCell = c.url ? ('<a href="'+c.url+'" target="_blank" rel="noopener noreferrer">Abrir</a>') : '—';
+    var tr=document.createElement('tr');
+    tr.innerHTML=
+      '<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td>'+
+      '<td>'+(c.list||'—')+'</td>'+
+      '<td>'+(c.owner||'—')+'</td>'+
+      '<td>'+fmtDate(c.due)+'</td>'+
+      '<td>'+fmtDate(c.finalDue)+'</td>'+
+      '<td>'+tagForPUC(c.puc)+'</td>'+
+      '<td class="right" style="font-weight:700">'+prog+'</td>'+
+      '<td>'+linkCell+'</td>';
+    tbody.appendChild(tr);
+  });
+  $('#totalRows').textContent=rows.length;
+}
 function populateMemberFilter(members){ var sel=$('#memberFilter'); if(!sel) return; var current=sel.value; sel.innerHTML='<option value="">Todos</option>'+members.map(function(m){return '<option value="'+m.name+'">'+m.name+'</option>';}).join(''); if(current && Array.from(sel.options).some(function(o){return o.value===current;})) sel.value=current; }
 function applyTableFilters(){ var rows=FULL_ROWS.slice(); var q=($('#filterInput')&&$('#filterInput').value||'').trim().toLowerCase(); var who=($('#memberFilter')&&$('#memberFilter').value)||''; if(q){ rows=rows.filter(function(r){return (r.name||'').toLowerCase().indexOf(q)>-1;}); } if(who){ rows=rows.filter(function(r){return (r.owner||'')===who;}); } renderProjects(rows); }
 
@@ -251,13 +322,13 @@ function loadAndRender(raw){ try{ var ing=ingestTrello(raw); LAST_RAW=raw; var m
 $('#projects thead th[data-sort="progress"]').addEventListener('click', function(){ sortAsc=!sortAsc; var sorted=CURRENT_ROWS.slice().sort(function(a,b){ var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return sortAsc? (ap-bp):(bp-ap); }); renderProjects(sorted); });
 
 var fileInput=$('#fileInput'); var fileLabel=$('#fileLabel');
-fileInput.addEventListener('change', function(ev){ var f=ev.target.files && ev.target.files[0]; if(!f){return;} fileLabel.textContent='Selecionado: '+f.name; try{ var reader=new FileReader(); reader.onload=function(){ try{ var txt=String(reader.result||''); var clean=txt.replace(/^\uFEFF/, ''); var json=JSON.parse(clean); loadAndRender(json);}catch(e){ console.error(e); setMsg('Erro ao ler arquivo: '+(e.message||e)); alert('Arquivo inválido.\n\n'+(e.message||e)); } }; reader.onerror=function(){ setMsg('Falha ao ler arquivo: '+(reader.error||''));}; reader.readAsText(f); }catch(e){ setMsg('Erro ao preparar leitura: '+(e.message||e)); } });
+fileInput.addEventListener('change', function(ev){ var f=ev.target.files && ev.target.files[0]; if(!f){return;}  try{ var reader=new FileReader(); reader.onload=function(){ try{ var txt=String(reader.result||''); var clean=txt.replace(/^\uFEFF/, ''); var json=JSON.parse(clean); loadAndRender(json);}catch(e){ console.error(e); setMsg('Erro ao ler arquivo: '+(e.message||e)); alert('Arquivo inválido.\n\n'+(e.message||e)); } }; reader.onerror=function(){ setMsg('Falha ao ler arquivo: '+(reader.error||''));}; reader.readAsText(f); }catch(e){ setMsg('Erro ao preparar leitura: '+(e.message||e)); } });
 
-$('#btnDemo').addEventListener('click', function(){ var demo={ lists:[{id:'l1',name:'Dev'},{id:'l2',name:'Concluído'},{id:'l3',name:'Backlog'},{id:'l4',name:'Acompanha Resultados'}], members:[{id:'m1',fullName:'ricardo.michelin'},{id:'m2',fullName:'Beatriz Cristina Causs Barbieri'}], checklists:[{idCard:'c1',checkItems:[{state:'complete'},{state:'complete'},{state:'incomplete'}]},{idCard:'c2',checkItems:[{state:'complete'},{state:'complete'}]}], cards:[ {id:'c1',idList:'l1',name:'Integração API X',due:'2025-09-20',idMembers:['m1'],labels:[{name:'Urgente'}]}, {id:'c2',idList:'l2',name:'Entrega Módulo Y',due:'2025-08-30',idMembers:['m2'],labels:[{name:'Prioridade'}]}, {id:'c3',idList:'l3',name:'Backlog',due:null,idMembers:['m2'],labels:[]}, {id:'c4',idList:'l4',name:'Estudo Z',due:null,idMembers:[],labels:[{name:'Crítico'}]} ] }; loadAndRender(demo); setMsg('Demo carregada • '+demo.cards.length+' cards'); });
+var _bDemo=$('#btnDemo'); if(_bDemo) _bDemo.addEventListener('click', function(){ var demo={ lists:[{id:'l1',name:'Dev'},{id:'l2',name:'Concluído'},{id:'l3',name:'Backlog'},{id:'l4',name:'Acompanha Resultados'}], members:[{id:'m1',fullName:'ricardo.michelin'},{id:'m2',fullName:'Beatriz Cristina Causs Barbieri'}], checklists:[{idCard:'c1',checkItems:[{state:'complete'},{state:'complete'},{state:'incomplete'}]},{idCard:'c2',checkItems:[{state:'complete'},{state:'complete'}]}], cards:[ {id:'c1',idList:'l1',name:'Integração API X',due:'2025-09-20',idMembers:['m1'],labels:[{name:'Urgente'}]}, {id:'c2',idList:'l2',name:'Entrega Módulo Y',due:'2025-08-30',idMembers:['m2'],labels:[{name:'Prioridade'}]}, {id:'c3',idList:'l3',name:'Backlog',due:null,idMembers:['m2'],labels:[]}, {id:'c4',idList:'l4',name:'Estudo Z',due:null,idMembers:[],labels:[{name:'Crítico'}]} ] }; loadAndRender(demo); setMsg('Demo carregada • '+demo.cards.length+' cards'); });
 
-$('#btnReset').addEventListener('click', function(){ LAST_RAW=null; $('#kpi-valid').textContent='–'; $('#kpi-valid-pct').textContent='–'; $('#kpi-done').textContent='–'; $('#kpi-done-pct').textContent='–'; $('#members').innerHTML=''; $('#kanban').innerHTML=''; $('#projects tbody').innerHTML=''; $('#totalRows').textContent='0'; fileInput.value=''; fileLabel.textContent='Selecionar JSON do Trello'; setMsg('Pronto para carregar um JSON do Trello…'); });
+var _bReset=$('#btnReset'); if(_bReset) _bReset.addEventListener('click', function(){ LAST_RAW=null; $('#kpi-valid').textContent='–'; $('#kpi-valid-pct').textContent='–'; $('#kpi-done').textContent='–'; $('#kpi-done-pct').textContent='–'; $('#members').innerHTML=''; $('#kanban').innerHTML=''; $('#projects tbody').innerHTML=''; $('#totalRows').textContent='0'; fileInput.value=''; fileLabel.textContent='Selecionar JSON do Trello'; setMsg('Pronto para carregar um JSON do Trello…'); });
 
-$('#btnFetchLocal').addEventListener('click', function(){ (function(){ try{ if(location.protocol==='file:'){ setMsg('Aviso: aberto via file://. Alguns navegadores bloqueiam leitura local. Prefira http (ex.: GitHub Pages) ou use Selecionar JSON.'); } fetch('./projetos.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(j){ loadAndRender(j); setMsg('Arquivo carregado: ./projetos.json'); }).catch(function(e){ console.error(e); setMsg('Falha ao carregar ./projetos.json: '+(e.message||e)); alert('Não foi possível ler ./projetos.json.'); }); }catch(e){ setMsg('Falha geral ao buscar ./projetos.json: '+(e.message||e)); } })(); });
+var _bFetch=$('#btnFetchLocal'); if(_bFetch) _bFetch.addEventListener('click', function(){ (function(){ try{ if(location.protocol==='file:'){ setMsg('Aviso: aberto via file://. Alguns navegadores bloqueiam leitura local. Prefira http (ex.: GitHub Pages) ou use Selecionar JSON.'); } fetch('./projetos.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(j){ loadAndRender(j); setMsg('Arquivo carregado: ./projetos.json'); }).catch(function(e){ console.error(e); setMsg('Falha ao carregar ./projetos.json: '+(e.message||e)); alert('Não foi possível ler ./projetos.json.'); }); }catch(e){ setMsg('Falha geral ao buscar ./projetos.json: '+(e.message||e)); } })(); });
 
 // Erros globais
 window.addEventListener('error', function(e){ setMsg('Erro de script: '+(e && e.message? e.message : 'desconhecido')); });
