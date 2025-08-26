@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="dark light">
   <title>Dashboard – Neoenergia × Wittel</title>
   <style>
     :root{
@@ -13,48 +12,34 @@
     }
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0; background:var(--bg); color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-      line-height:1.5;}
-
-    /* A11y focus */
+    body{margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; line-height:1.5}
     :focus-visible{outline:2px solid var(--focus); outline-offset:3px; border-radius:8px}
 
-    header{
-      padding:24px 20px; border-bottom:1px solid var(--stroke);
-      display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
-    }
-    .brand{display:flex; align-items:center; gap:12px}
+    header{padding:20px; border-bottom:1px solid var(--stroke); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .brand{display:flex; align-items:center; gap:10px}
     .brand h1{font-size:18px; margin:0}
     .actions{display:flex; gap:8px; flex-wrap:wrap}
 
     .btn{background:var(--accent-2); color:#0b1220; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
     .btn.secondary{background:#0e1725; color:var(--text); border:1px solid var(--stroke)}
-    .btn[disabled]{opacity:.6; cursor:not-allowed}
-
-    .pill{display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px; background:var(--chip); color:var(--muted); font-size:12px; border:1px solid var(--stroke)}
 
     .file-wrap{position:relative}
-    input[type="file"]{position:absolute; inset:0; opacity:0; cursor:pointer}
+    input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
     .file-label{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; background:var(--card); border:1px dashed var(--stroke); color:var(--muted)}
 
-    main{padding:22px; max-width:1400px; margin:0 auto;}
+    main{padding:22px; max-width:1400px; margin:0 auto}
     .grid{display:grid; gap:16px}
-    .cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
     .cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
-    @media (max-width:1100px){.cols-3{grid-template-columns:1fr}}
     @media (max-width:900px){.cols-2{grid-template-columns:1fr}}
 
-    .card{background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:16px 16px 12px}
-    .card h2{margin:0 0 10px; font-size:16px; font-weight:700; letter-spacing:.2px}
+    .card{background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:16px}
+    .card h2{margin:0 0 10px; font-size:16px; font-weight:700}
     .muted{color:var(--muted)}
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
 
-    /* KPI */
     .kpi{display:flex; align-items:baseline; justify-content:space-between; border-top:1px dashed var(--stroke); padding-top:10px; margin-top:10px}
     .kpi .big{font-size:28px; font-weight:800}
 
-    /* Kanban tiles */
     .kanban-list{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
     @media (max-width:1100px){.kanban-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:680px){.kanban-list{grid-template-columns:1fr}}
@@ -64,12 +49,10 @@
     .tile .fill{height:8px; background:linear-gradient(90deg, var(--accent-2), #8b5cf6)}
     .tile .foot{display:flex; justify-content:space-between; margin-top:6px; color:var(--muted); font-size:12px}
 
-    /* Members bars */
     .bars{display:flex; flex-direction:column; gap:10px; margin-top:6px}
     .bar-outer{height:12px; background:#10151e; border:1px solid var(--stroke); border-radius:999px; overflow:hidden}
     .bar-inner{height:12px; background:linear-gradient(90deg, var(--accent), #4ade80)}
 
-    /* Table */
     table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14px}
     th, td{padding:10px 8px; border-bottom:1px solid var(--stroke); vertical-align:top}
     th{color:var(--muted); font-weight:600; text-align:left}
@@ -77,90 +60,73 @@
     .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
     .tag.ok{background:rgba(16,185,129,.1); color:#22c55e; border-color:rgba(16,185,129,.2)}
     .tag.warn{background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2)}
-    .tag.danger{background:rgba(239,68,68,.1); color:#ef4444; border-color:rgba(239,68,68,.2)}
-    .stack{display:flex; gap:6px; flex-wrap:wrap}
-    .right{text-align:right}
-    .small{font-size:12px}
-    .sep{height:1px; background:var(--stroke); margin:8px 0 4px}
-    .help{font-size:12px; color:var(--muted)}
     .hidden{display:none}
 
-    footer{padding:18px 22px; border-top:1px solid var(--stroke); color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px}
+    .badge{display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:999px; font-size:11px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
+    .badge.new{background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.3)}
+    .overcap{color:#fca5a5}
   </style>
 </head>
 <body>
-  <header role="banner">
+  <header>
     <div class="brand">
-      <span class="pill" aria-label="Parceria">Neoenergia × Wittel</span>
+      <span class="tag">Neoenergia × Wittel</span>
       <h1>Dashboard</h1>
     </div>
     <div class="actions" role="group" aria-label="Carregar dados">
       <div class="file-wrap">
         <span id="fileLabel" class="file-label" aria-live="polite">Selecionar JSON do Trello</span>
-        <input id="fileInput" type="file" accept=".json" aria-describedby="fileHelp">
+        <input id="fileInput" type="file" accept=".json,application/json" aria-describedby="fileHelp">
       </div>
+      <button id="btnFetchLocal" type="button" class="btn secondary" title="Tentar ler projetos.json da mesma pasta">Abrir projetos.json (pasta)</button>
       <button id="btnDemo" type="button" class="btn" title="Carregar exemplo mínimo embutido">Carregar exemplo</button>
       <button id="btnReset" type="button" class="btn secondary" title="Limpar dados e voltar ao estado inicial">Limpar</button>
     </div>
-    <button id="btnFetchLocal" type="button" class="btn secondary" title="Tentar ler projetos.json da mesma pasta do HTML">Abrir projetos.json (pasta)</button>
   </header>
 
   <div id="msg" style="padding:10px 20px;color:#e6e7e9;background:#0e1116;border-bottom:1px solid var(--stroke);font-size:12px">Pronto para carregar um JSON do Trello…</div>
-  <main class="grid cols-2" id="mainContent">
-    <!-- KPIs -->
+  <details id="dbg" style="margin:8px 22px"><summary style="cursor:pointer">Diagnóstico</summary>
+    <pre id="dbgLog" style="white-space:pre-wrap; font-size:12px; color:var(--muted); background:#0e1116; border:1px solid var(--stroke); border-radius:10px; padding:10px; max-height:200px; overflow:auto"></pre>
+  </details>
+
+  <main id="mainContent" class="grid cols-2">
     <section class="card" aria-labelledby="resumo-h2">
       <h2 id="resumo-h2">Resumo</h2>
-      <div id="kpis" class="grid cols-2" role="region" aria-label="Indicadores">
-        <div class="card" aria-live="polite">
-          <div class="row"><span class="pill">Cards válidos</span></div>
-          <div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div>
-        </div>
-        <div class="card" aria-live="polite">
-          <div class="row"><span class="pill">Finalizados</span></div>
-          <div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div>
-        </div>
+      <div id="kpis" class="grid cols-2">
+        <div class="card"><div class="row"><span class="tag">Cards válidos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>
+        <div class="card"><div class="row"><span class="tag">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>
       </div>
-      <div class="sep"></div>
-      <p id="fileHelp" class="help">
-        Regras ativas: desconsidera <b>Painel</b> (inteira) e cards cujo <b>name</b> é igual ao <b>name</b> da lista. 
-        Fora do fluxo: <b>Backlog</b>, <b>Suspenso</b>, <b>Cancelado</b>. Finalizados: <b>Concluido</b>, <b>Acompanha Resultados</b>.
-      </p>
+      <p id="fileHelp" class="muted" style="margin-top:8px">Regras: exclui lista <b>Painel</b> e cards cujo <b>name</b> = nome da lista. Fora do fluxo: <b>Backlog</b>, <b>Suspenso</b>, <b>Cancelado</b>. Finalizados: <b>Concluído</b>, <b>Acompanha Resultados</b>.</p>
     </section>
 
-    <!-- Members -->
     <section class="card" aria-labelledby="membros-h2">
       <h2 id="membros-h2">Membros</h2>
-      <div class="help">Nomes padronizados e em ordem alfabética.</div>
-      <div id="members" class="bars" aria-live="polite"></div>
+      <div class="muted">Nomes padronizados e em ordem alfabética.</div>
+      <div id="members" class="bars"></div>
     </section>
 
-    <!-- Kanban -->
     <section class="card" style="grid-column:1 / -1" aria-labelledby="kanban-h2">
-      <div class="row">
-        <h2 id="kanban-h2" style="margin-right:auto">Kanban</h2>
-        <span class="pill small" aria-label="Somente listas ativas">Somente listas ativas</span>
-      </div>
+      <div class="row"><h2 id="kanban-h2" style="margin-right:auto">Kanban</h2><span class="tag">Somente listas ativas</span></div>
       <div id="kanban" class="kanban-list" role="list"></div>
     </section>
 
-    <!-- Projects table -->
     <section class="card" style="grid-column:1 / -1" aria-labelledby="projetos-h2">
-      <div class="row">
-        <h2 id="projetos-h2">Projetos (Progresso %)</h2>
-        <span class="help">Ordenado por Progresso decrescente. Itens fora do fluxo aparecem no final.</span>
-      </div>
+      <div class="row"><h2 id="projetos-h2">Projetos (Progresso %)</h2><span class="muted">Ordenado por Progresso. Itens fora do fluxo no final.</span></div>
       <div class="row" style="justify-content:space-between; align-items:center">
-        <label class="small muted">Filtro rápido: <input id="filterInput" aria-label="Filtrar por nome do projeto" placeholder="Digite para filtrar…" style="background:#0f1320; border:1px solid var(--stroke); color:var(--text); padding:6px 8px; border-radius:8px"></label>
-        <div class="small muted">Total: <span id="totalRows">0</span></div>
+        <div class="row" style="gap:12px; align-items:center">
+          <label class="muted">Filtro: <input id="filterInput" aria-label="Filtrar por nome do projeto" placeholder="Digite para filtrar" style="background:#0f1320; border:1px solid var(--stroke); color:var(--text); padding:6px 8px; border-radius:8px"></label>
+          <label class="muted">Membro:
+            <select id="memberFilter" aria-label="Filtrar por responsável" style="background:#0f1320; border:1px solid var(--stroke); color:var(--text); padding:6px 8px; border-radius:8px">
+              <option value="">Todos</option>
+            </select>
+          </label>
+        </div>
+        <div class="muted">Total: <span id="totalRows">0</span></div>
       </div>
       <table id="projects">
         <thead>
           <tr>
-            <th>Projeto</th>
-            <th>Lista</th>
-            <th>Responsável</th>
-            <th>Entrega</th>
-            <th>PUC</th>
+            <th>Projeto</th><th>Lista</th><th>Responsável</th><th>Entrega</th><th>PUC</th>
             <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar por progresso">Progresso ▲▼</th>
           </tr>
         </thead>
@@ -169,332 +135,113 @@
     </section>
   </main>
 
-  <footer role="contentinfo">
-    <span class="small">Dashboard local – seus dados não saem do navegador.</span>
-    <span class="small">Use "Carregar exemplo" para testar sem JSON.</span>
+  <footer style="padding:18px 22px; border-top:1px solid var(--stroke); color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px">
+    <span>Dashboard local – seus dados não saem do navegador.</span>
+    <span>Use "Carregar exemplo" para testar sem JSON.</span>
   </footer>
 
 <script>
-// ==============================
-// UTILITIES (normalização e helpers)
-// ==============================
-const $ = (sel,root=document)=>root.querySelector(sel);
-const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
-const norm = (s)=> String(s||"").normalize('NFD').replace(/[̀-ͯ]/g,'').trim().toLowerCase();
-const titleCaseLike = (str)=>{
-  if(!str) return "";
-  if(str.includes(".")) return str.split(".").map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(" ");
-  const low = ["de","da","do","dos","das","e","ou","em","no","na"];
-  return str.split(" ").map(w=>{
-    if(!w) return w;
-    return low.includes(w.toLowerCase()) ? w.toLowerCase() : (w.charAt(0).toUpperCase()+w.slice(1));
-  }).join(" ");
-};
-function normalizeMember(raw){
-  if(!raw) return "—";
-  const key = String(raw).trim();
-  return MEMBER_MAP.get(key) || titleCaseLike(key);
-}
-function fmtPct(n){ return (isNaN(n)||n==null) ? "—" : (Math.round(n*1000)/10).toFixed(1).replace(".0","")+"%"; }
-function fmtDate(s){ if(!s) return "—"; const d=new Date(s); if(isNaN(d)) return "—"; const dd=String(d.getDate()).padStart(2,"0"); const mm=String(d.getMonth()+1).padStart(2,"0"); const yyyy=d.getFullYear(); return `${dd}/${mm}/${yyyy}`; }
-function tagForPUC(puc){ const v=(puc||"").toLowerCase(); if(v==="crítico"||v==="critico") return `<span class="tag danger">Crítico</span>`; if(v==="urgente") return `<span class="tag warn">Urgente</span>`; if(v==="prioridade") return `<span class="tag ok">Prioridade</span>`; return `<span class="tag">—</span>`; }
+"use strict";
+// ===== Helpers =====
+function $(sel,root){return (root||document).querySelector(sel);} 
+function $$(sel,root){return Array.from((root||document).querySelectorAll(sel));}
+function logd(){var s=Array.from(arguments).map(function(x){try{return typeof x==='string'?x:JSON.stringify(x);}catch(_){return String(x);}}).join(' '); var el=$('#dbgLog'); if(el){el.textContent+=s+'\n'; el.scrollTop=el.scrollHeight;} if(window.console&&console.debug){console.debug('[DBG]',s);} }
+function setMsg(t){var el=$('#msg'); if(el){el.textContent=t;}}
 
-// ==============================
-// CONFIG & RULES (com acentos e normalização)
-// ==============================
-const ORDERED_ACTIVE_LABELS = [
-  "A fazer","Estudo Téc/RN","Levantamento de esforço","Aprovação de esforço","Construção Crono",
-  "Construção da EF","Validação da EF","Débito Técnico","Dev","Homologação","Certificação","Deploy",
-  "Acompanha Resultados","Concluído"
+function stripAccents(s){return s? s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
+function norm(s){s=String(s||'').trim(); s=s.replace(/\s+/g,' '); var k=stripAccents(s).toLowerCase(); if(k==='acompanha resultado'||k==='acompanha resultados') return 'acompanha resultados'; if(k==='concluido'||k==='concluído') return 'concluido'; if(k==='painel') return 'painel'; if(k==='backlog') return 'backlog'; if(k==='suspenso') return 'suspenso'; if(k==='cancelado') return 'cancelado'; return k;}
+function renderLabel(key){if(key==='acompanha resultados') return 'Acompanha Resultados'; if(key==='concluido') return 'Concluído'; if(key==='painel') return 'Painel'; if(key==='backlog') return 'Backlog'; if(key==='suspenso') return 'Suspenso'; if(key==='cancelado') return 'Cancelado'; return key.split(' ').map(function(w){var lows={de:1,da:1,do:1,dos:1,das:1,e:1,ou:1,em:1,no:1,na:1}; return lows[w]?w:(w.charAt(0).toUpperCase()+w.slice(1));}).join(' ');} 
+function titleCaseLike(str){if(!str) return ''; var low=['de','da','do','dos','das','e','ou','em','no','na']; return String(str).split(' ').map(function(w){if(!w) return w; return low.indexOf(w.toLowerCase())>-1 ? w.toLowerCase() : (w.charAt(0).toUpperCase()+w.slice(1));}).join(' ');} 
+function normalizeMember(raw){if(!raw) return '—'; var key=String(raw).trim(); return MEMBER_MAP.get(key)||titleCaseLike(key);} 
+function fmtPct(n){if(isNaN(n)||n==null) return '—'; var v=Math.round(n*1000)/10; return (v.toFixed(1).replace('.0',''))+'%';}
+function fmtDate(s){if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return '—'; var dd=String(d.getDate()).padStart(2,'0'); var mm=String(d.getMonth()+1).padStart(2,'0'); var yyyy=d.getFullYear(); return dd+'/'+mm+'/'+yyyy;}
+function tagForPUC(puc){var v=String(puc||'').toLowerCase(); if(v==='crítico'||v==='critico') return '<span class="tag warn">Crítico</span>'; if(v==='urgente') return '<span class="tag warn">Urgente</span>'; if(v==='prioridade') return '<span class="tag ok">Prioridade</span>'; return '<span class="tag">—</span>';}
+
+// ===== Config =====
+var ORDERED_ACTIVE_LABELS=[
+  'A fazer','Estudo Téc/RN','Levantamento de esforço','Aprovação de esforço','Construção Crono',
+  'Construção da EF','Validação da EF','Débito Técnico','Dev','Homologação','Certificação','Deploy',
+  'Acompanha Resultados','Concluído'
 ];
-const ORDERED_ACTIVE_KEYS = ORDERED_ACTIVE_LABELS.map(norm);
-const OUT_OF_FLOW_KEYS = new Set(["Backlog","Suspenso","Cancelado"].map(norm));
-const DONE_LIST_KEYS = new Set(["Concluído","Acompanha Resultados"].map(norm));
-const EXCLUDE_FULL_LIST_KEYS = new Set(["Painel"].map(norm));
-const MEMBER_MAP = new Map([
-  ["Beatriz Cristina Causs Barbieri","Beatriz Causs"],
-  ["ricardo.michelin","Ricardo Michelin"],
-  ["Renan mora rodrigues da silva","Renan Mora"],
-  ["Nataly Rubi Cardoso","Nataly Cardoso"],
-  ["mariany.felix","Mariany Felix"],
-  ["patricia.tasseli","Patricia Tasseli"]
+var ORDERED_ACTIVE_KEYS=ORDERED_ACTIVE_LABELS.map(norm);
+var OUT_OF_FLOW_KEYS=new Set(['Backlog','Suspenso','Cancelado'].map(norm));
+var DONE_LIST_KEYS=new Set(['Concluído','Acompanha Resultados'].map(norm));
+var EXCLUDE_FULL_LIST_KEYS=new Set(['Painel'].map(norm));
+var MEMBER_MAP=new Map([
+  ['Beatriz Cristina Causs Barbieri','Beatriz Causs'],
+  ['ricardo.michelin','Ricardo Michelin'],
+  ['Renan mora rodrigues da silva','Renan Mora'],
+  ['Nataly Rubi Cardoso','Nataly Cardoso'],
+  ['mariany.felix','Mariany Felix'],
+  ['patricia.tasseli','Patricia Tasseli']
 ]);
 
-// ==============================
-// PARSE Trello-like JSON
-// ==============================
+// members.json (opcional; não bloqueia nada)
+var CONFIG={aliases:{},teams:{},capacity:{}};
+(function(){ try{ if(/^https?:/i.test(location.protocol)){ fetch('./members.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) return null; return r.json(); }).then(function(j){ if(!j) return; CONFIG.aliases=j.aliases||{}; CONFIG.teams=j.teams||{}; CONFIG.capacity=j.capacity||{}; Object.keys(CONFIG.aliases).forEach(function(alias){ MEMBER_MAP.set(alias, CONFIG.aliases[alias]); }); setMsg('Config de membros carregada'); }).catch(function(){/* ignora */}); } }catch(_){/* ignora */} })();
+
+// ===== Parse Trello JSON =====
 function ingestTrello(raw){
-  let listsById = new Map();
-  let membersById = new Map();
-  let checklistsByCard = new Map();
-  let cards = [];
+  var listsById=new Map();
+  var membersById=new Map();
+  var checklistsByCard=new Map();
+  var cards=[];
 
-  if(Array.isArray(raw.cards) && Array.isArray(raw.lists)){
-    raw.lists.forEach(l=>{ listsById.set(l.id, {id:l.id, name:String(l.name||"").trim()}); });
-    if(Array.isArray(raw.members)){
-      raw.members.forEach(m=>{ const name = m.fullName || m.username || m.name || ""; membersById.set(m.id, normalizeMember(name)); });
-    }
-    if(Array.isArray(raw.checklists)){
-      raw.checklists.forEach(cl=>{
-        const items = Array.isArray(cl.checkItems) ? cl.checkItems : [];
-        const done = items.filter(i=>String(i.state).toLowerCase()==="complete").length;
-        const total = items.length;
-        const current = checklistsByCard.get(cl.idCard) || {done:0,total:0};
-        checklistsByCard.set(cl.idCard, {done: current.done+done, total: current.total+total});
-      });
-    }
-    cards = (raw.cards||[]).filter(c => !c.closed).map(c=>{
-      const list = listsById.get(c.idList);
-      const listName = list ? list.name : (c.listName || "");
-      const listKey = norm(listName);
-      let puc = null;
-      if(Array.isArray(c.labels)){
-        const names = c.labels.map(l => (l.name||"").toLowerCase());
-        if(names.includes("crítico") || names.includes("critico")) puc = "Crítico";
-        else if(names.includes("urgente")) puc = "Urgente";
-        else if(names.includes("prioridade")) puc = "Prioridade";
-      } else if(typeof c.puc === "string"){ puc = c.puc; }
-      let owner = "—";
-      if(Array.isArray(c.idMembers) && c.idMembers.length){ const m = membersById.get(c.idMembers[0]); if(m) owner = m; }
-      else if(c.member){ owner = normalizeMember(c.member); }
-      const agg = checklistsByCard.get(c.id) || {done:0,total:0};
-      const progress = agg.total>0 ? agg.done/agg.total : null;
-      return { id:c.id, name:String(c.name||"").trim(), list:listName, listKey, due:c.due || c.dueDate || c.dataEntrega || null, owner, puc, progress };
-    });
-
+  if(Array.isArray(raw.cards)&&Array.isArray(raw.lists)){
+    raw.lists.forEach(function(l){ listsById.set(l.id,{id:l.id,name:String(l.name||'').trim(),closed:!!l.closed}); });
+    if(Array.isArray(raw.members)) raw.members.forEach(function(m){ var name=m.fullName||m.username||m.name||''; membersById.set(m.id, normalizeMember(name)); });
+    if(Array.isArray(raw.checklists)) raw.checklists.forEach(function(cl){ var items=Array.isArray(cl.checkItems)?cl.checkItems:[]; var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length; var total=items.length; var cur=checklistsByCard.get(cl.idCard)||{done:0,total:0}; checklistsByCard.set(cl.idCard,{done:cur.done+done,total:cur.total+total}); });
+    cards=(raw.cards||[]).filter(function(c){return !c.closed;}).map(function(c){ var list=listsById.get(c.idList); var listName=list?list.name:(c.listName||''); var listKey=norm(listName); var puc=null; if(Array.isArray(c.labels)){ var names=c.labels.map(function(l){return (l.name||'').toLowerCase();}); if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico'; else if(names.indexOf('urgente')>-1) puc='Urgente'; else if(names.indexOf('prioridade')>-1) puc='Prioridade'; } else if(typeof c.puc==='string'){ puc=c.puc; } var owner='—'; if(Array.isArray(c.idMembers)&&c.idMembers.length){ var m=membersById.get(c.idMembers[0]); if(m) owner=m; } else if(c.member){ owner=normalizeMember(c.member);} var agg=checklistsByCard.get(c.id)||{done:0,total:0}; var progress=agg.total>0? (agg.done/agg.total):null; return { id:c.id, name:String(c.name||'').trim(), list:listName, listKey:listKey, due:c.due||c.dueDate||c.dataEntrega||null, owner:owner, puc:puc, progress:progress }; });
   } else if(Array.isArray(raw)){
-    cards = raw.map(c=>{
-      const listName = (c.list||c.lista||"").trim();
-      return {
-        id: c.id || c.cardId || Math.random().toString(36).slice(2),
-        name: (c.name||c.card||"").trim(),
-        list: listName,
-        listKey: norm(listName),
-        due: c.due || c.dueDate || c.dataEntrega || null,
-        owner: normalizeMember(c.owner||c.responsavel||c.member||""),
-        puc: c.puc || c.PUC || null,
-        progress: (typeof c.progressPct==="number") ? (c.progressPct/100) : (typeof c.progress === "number") ? c.progress : null
-      };
-    });
-  } else {
-    throw new Error("Formato de JSON não reconhecido.");
-  }
+    cards=raw.map(function(c){ var listName=(c.list||c.lista||'').trim(); return { id:c.id||c.cardId||Math.random().toString(36).slice(2), name:(c.name||c.card||'').trim(), list:listName, listKey:norm(listName), due:c.due||c.dueDate||c.dataEntrega||null, owner:normalizeMember(c.owner||c.responsavel||c.member||''), puc:c.puc||c.PUC||null, progress:(typeof c.progressPct==='number')?(c.progressPct/100): (typeof c.progress==='number')?c.progress:null }; });
+  } else { throw new Error('Formato de JSON não reconhecido.'); }
 
-  // Filters (usando nomes normalizados)
-  cards = cards.filter(c => !EXCLUDE_FULL_LIST_KEYS.has(c.listKey));
-  cards = cards.filter(c => (c.name||"") !== (c.list||""));
-  return {cards};
+  // filtros
+  cards=cards.filter(function(c){return !EXCLUDE_FULL_LIST_KEYS.has(c.listKey);});
+  cards=cards.filter(function(c){return (c.name||'')!==(c.list||'');});
+  return {cards:cards};
 }
 
-// ==============================
-// METRICS & RENDER
-// ==============================
+// ===== Métricas & Render =====
 function compute(cards){
-  const totalValid = cards.length;
-  const doneCount = cards.filter(c => DONE_LIST_KEYS.has(c.listKey)).length;
-  const byList = new Map(ORDERED_ACTIVE_KEYS.map((k,i)=>[k,0]));
-  cards.forEach(c=>{ if(byList.has(c.listKey)){ byList.set(c.listKey, (byList.get(c.listKey)||0)+1); } });
-  const byMember = new Map();
-  cards.forEach(c=>{ const m = c.owner || "—"; byMember.set(m, (byMember.get(m)||0)+1); });
-  const members = Array.from(byMember.entries()).map(([name,count])=>({name, count})).sort((a,b)=>a.name.localeCompare(b.name));
-  const sorted = [...cards].sort((a,b)=>{
-    const aOut = OUT_OF_FLOW_KEYS.has(a.listKey) ? 1 : 0; const bOut = OUT_OF_FLOW_KEYS.has(b.listKey) ? 1 : 0;
-    if(aOut !== bOut) return aOut - bOut; // in-flow first
-    const ap = (a.progress ?? -1); const bp = (b.progress ?? -1);
-    return (bp - ap);
-  });
-  return { totalValid, doneCount, byList, members, sorted };
+  var totalValid=cards.length;
+  var doneCount=cards.filter(function(c){return DONE_LIST_KEYS.has(c.listKey);}).length;
+  var byList=new Map(ORDERED_ACTIVE_KEYS.map(function(k){return [k,0];}));
+  cards.forEach(function(c){ if(byList.has(c.listKey)){ byList.set(c.listKey,(byList.get(c.listKey)||0)+1); } });
+  var byMember=new Map();
+  cards.forEach(function(c){ var m=c.owner||'—'; byMember.set(m,(byMember.get(m)||0)+1); });
+  var members=Array.from(byMember.entries()).map(function(e){return {name:e[0],count:e[1]};}).sort(function(a,b){return a.name.localeCompare(b.name);});
+  var sorted=cards.slice().sort(function(a,b){ var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0; if(aOut!==bOut) return aOut-bOut; var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap; });
+  return { totalValid:totalValid, doneCount:doneCount, byList:byList, members:members, sorted:sorted };
 }
+function renderKpis(m){ $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—'; $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—'; }
+function renderKanban(byList, total){ var wrap=$('#kanban'); wrap.innerHTML=''; ORDERED_ACTIVE_KEYS.forEach(function(key,idx){ var qty=byList.get(key)||0; var pct=total? (qty/total):0; var label=ORDERED_ACTIVE_LABELS[idx]; var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem'); el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>'; wrap.appendChild(el); }); }
+function renderMembers(members){ var wrap=$('#members'); wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
 
-function renderKpis({totalValid, doneCount}){
-  $("#kpi-valid").textContent = totalValid;
-  $("#kpi-valid-pct").textContent = totalValid ? fmtPct(1) : "—";
-  $("#kpi-done").textContent = doneCount;
-  $("#kpi-done-pct").textContent = totalValid ? fmtPct(doneCount/totalValid) : "—";
-}
+var CURRENT_ROWS=[]; var FULL_ROWS=[]; var sortAsc=false;
+function renderProjects(rows){ CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML=''; rows.forEach(function(c){ var statusTag= OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' : (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' : '<span class="tag">Andamento</span>'); var prog=(c.progress==null)? '—' : fmtPct(c.progress); var tr=document.createElement('tr'); tr.innerHTML='<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td><td>'+(c.list||'—')+'</td><td>'+(c.owner||'—')+'</td><td>'+fmtDate(c.due)+'</td><td>'+tagForPUC(c.puc)+'</td><td class="right" style="font-weight:700">'+prog+'</td>'; tbody.appendChild(tr); }); $('#totalRows').textContent=rows.length; }
+function populateMemberFilter(members){ var sel=$('#memberFilter'); if(!sel) return; var current=sel.value; sel.innerHTML='<option value="">Todos</option>'+members.map(function(m){return '<option value="'+m.name+'">'+m.name+'</option>';}).join(''); if(current && Array.from(sel.options).some(function(o){return o.value===current;})) sel.value=current; }
+function applyTableFilters(){ var rows=FULL_ROWS.slice(); var q=($('#filterInput')&&$('#filterInput').value||'').trim().toLowerCase(); var who=($('#memberFilter')&&$('#memberFilter').value)||''; if(q){ rows=rows.filter(function(r){return (r.name||'').toLowerCase().indexOf(q)>-1;}); } if(who){ rows=rows.filter(function(r){return (r.owner||'')===who;}); } renderProjects(rows); }
 
-function renderKanban(byList, totalValid){
-  const wrap = $("#kanban"); wrap.innerHTML = "";
-  ORDERED_ACTIVE_KEYS.forEach((key, idx)=>{
-    const qty = byList.get(key)||0; const pct = totalValid ? (qty/totalValid) : 0;
-    const label = ORDERED_ACTIVE_LABELS[idx];
-    const el = document.createElement("div"); el.className = "tile"; el.setAttribute("role","listitem");
-    el.innerHTML = `<div class="name">${label}</div>
-      <div class="bar" aria-label="${label}"><div class="fill" style="width:${Math.round(pct*100)}%"></div></div>
-      <div class="foot"><span>${qty} cards</span><span>${fmtPct(pct)}</span></div>`;
-    wrap.appendChild(el);
-  });
-}
+// ===== Orquestração =====
+var LAST_RAW=null;
+function loadAndRender(raw){ try{ var ing=ingestTrello(raw); LAST_RAW=raw; var metrics=compute(ing.cards); renderKpis(metrics); renderKanban(metrics.byList, metrics.totalValid); renderMembers(metrics.members); FULL_ROWS=metrics.sorted; populateMemberFilter(metrics.members); applyTableFilters(); setMsg('Arquivo carregado com sucesso • '+metrics.totalValid+' cards válidos'); $('#mainContent').scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ console.error(e); setMsg('Erro ao processar: '+(e.message||e)); alert('Não consegui ler este JSON.\n\n'+(e.message||e)); } }
 
-function renderMembers(members){
-  const wrap = $("#members"); wrap.innerHTML = "";
-  if(!members.length){ wrap.innerHTML = `<div class="help">Sem responsáveis informados.</div>`; return; }
-  const universe = members.reduce((s,m)=>s+m.count,0);
-  members.forEach(m=>{
-    const pct = universe ? (m.count/universe) : 0;
-    const el = document.createElement("div");
-    el.innerHTML = `<div class="row" style="justify-content:space-between"><div>${m.name}</div>
-        <div class="muted small">${m.count} • ${fmtPct(pct)}</div></div>
-      <div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(pct*100)}" aria-label="${m.name}"><div class="bar-inner" style="width:${Math.round(pct*100)}%"></div></div>`;
-    wrap.appendChild(el);
-  });
-}
+// ===== UI Handlers =====
+$('#projects thead th[data-sort="progress"]').addEventListener('click', function(){ sortAsc=!sortAsc; var sorted=CURRENT_ROWS.slice().sort(function(a,b){ var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return sortAsc? (ap-bp):(bp-ap); }); renderProjects(sorted); });
 
-let CURRENT_ROWS = [];
-function renderProjects(rows){
-  CURRENT_ROWS = rows.slice();
-  const tbody = $("#projects tbody"); tbody.innerHTML = "";
-  rows.forEach(c=>{
-    const statusTag = OUT_OF_FLOW_KEYS.has(c.listKey) ? `<span class="tag warn">Fora do fluxo</span>` :
-                       DONE_LIST_KEYS.has(c.listKey)   ? `<span class="tag ok">Finalizado</span>` : `<span class="tag">Andamento</span>`;
-    const prog = (c.progress==null) ? "—" : fmtPct(c.progress);
-    const tr = document.createElement("tr");
-    tr.innerHTML = `<td><div style="font-weight:700">${c.name||"—"}</div><div class="stack small muted">${statusTag}</div></td>
-      <td>${c.list||"—"}</td>
-      <td>${c.owner||"—"}</td>
-      <td>${fmtDate(c.due)}</td>
-      <td>${tagForPUC(c.puc)}</td>
-      <td class="right" style="font-weight:700">${prog}</td>`;
-    tbody.appendChild(tr);
-  });
-  $("#totalRows").textContent = rows.length;
-}
+var fileInput=$('#fileInput'); var fileLabel=$('#fileLabel');
+fileInput.addEventListener('change', function(ev){ var f=ev.target.files && ev.target.files[0]; if(!f){return;} fileLabel.textContent='Selecionado: '+f.name; try{ var reader=new FileReader(); reader.onload=function(){ try{ var txt=String(reader.result||''); var clean=txt.replace(/^\uFEFF/, ''); var json=JSON.parse(clean); loadAndRender(json);}catch(e){ console.error(e); setMsg('Erro ao ler arquivo: '+(e.message||e)); alert('Arquivo inválido.\n\n'+(e.message||e)); } }; reader.onerror=function(){ setMsg('Falha ao ler arquivo: '+(reader.error||''));}; reader.readAsText(f); }catch(e){ setMsg('Erro ao preparar leitura: '+(e.message||e)); } });
 
-// ==============================
-// ORCHESTRATION
-// ==============================
-let LAST_RAW = null;
-function loadAndRender(raw){
-  try{
-    const {cards} = ingestTrello(raw); LAST_RAW = raw;
-    const metrics = compute(cards);
-    renderKpis(metrics);
-    renderKanban(metrics.byList, metrics.totalValid);
-    renderMembers(metrics.members);
-    renderProjects(metrics.sorted);
-    document.getElementById('msg').textContent = `Arquivo carregado com sucesso • ${cards.length} cards válidos`;
-    document.getElementById('mainContent').scrollIntoView({behavior:"smooth", block:"start"});
-  }catch(e){
-    console.error(e);
-    document.getElementById('msg').textContent = `Erro ao processar: ${e.message}`;
-    alert("Não consegui ler este JSON. Verifique o arquivo.
+$('#btnDemo').addEventListener('click', function(){ var demo={ lists:[{id:'l1',name:'Dev'},{id:'l2',name:'Concluído'},{id:'l3',name:'Backlog'},{id:'l4',name:'Acompanha Resultados'}], members:[{id:'m1',fullName:'ricardo.michelin'},{id:'m2',fullName:'Beatriz Cristina Causs Barbieri'}], checklists:[{idCard:'c1',checkItems:[{state:'complete'},{state:'complete'},{state:'incomplete'}]},{idCard:'c2',checkItems:[{state:'complete'},{state:'complete'}]}], cards:[ {id:'c1',idList:'l1',name:'Integração API X',due:'2025-09-20',idMembers:['m1'],labels:[{name:'Urgente'}]}, {id:'c2',idList:'l2',name:'Entrega Módulo Y',due:'2025-08-30',idMembers:['m2'],labels:[{name:'Prioridade'}]}, {id:'c3',idList:'l3',name:'Backlog',due:null,idMembers:['m2'],labels:[]}, {id:'c4',idList:'l4',name:'Estudo Z',due:null,idMembers:[],labels:[{name:'Crítico'}]} ] }; loadAndRender(demo); setMsg('Demo carregada • '+demo.cards.length+' cards'); });
 
-"+e.message);
-  }
-}
+$('#btnReset').addEventListener('click', function(){ LAST_RAW=null; $('#kpi-valid').textContent='–'; $('#kpi-valid-pct').textContent='–'; $('#kpi-done').textContent='–'; $('#kpi-done-pct').textContent='–'; $('#members').innerHTML=''; $('#kanban').innerHTML=''; $('#projects tbody').innerHTML=''; $('#totalRows').textContent='0'; fileInput.value=''; fileLabel.textContent='Selecionar JSON do Trello'; setMsg('Pronto para carregar um JSON do Trello…'); });
 
-// ==============================
-// UI HANDLERS
-// ==============================
-// (inclui botão para buscar ./projetos.json)
-const fileInput = $("#fileInput");
-const fileLabel = $("#fileLabel");
-const filterInput = $("#filterInput");
+$('#btnFetchLocal').addEventListener('click', function(){ (function(){ try{ if(location.protocol==='file:'){ setMsg('Aviso: aberto via file://. Alguns navegadores bloqueiam leitura local. Prefira http (ex.: GitHub Pages) ou use Selecionar JSON.'); } fetch('./projetos.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(j){ loadAndRender(j); setMsg('Arquivo carregado: ./projetos.json'); }).catch(function(e){ console.error(e); setMsg('Falha ao carregar ./projetos.json: '+(e.message||e)); alert('Não foi possível ler ./projetos.json.'); }); }catch(e){ setMsg('Falha geral ao buscar ./projetos.json: '+(e.message||e)); } })(); });
 
-fileInput.addEventListener("change", async (ev)=>{
-  const f = ev.target.files?.[0]; if(!f) return;
-  fileLabel.textContent = `Selecionado: ${f.name}`;
-  try{
-    const txt = await f.text();
-    const clean = txt.replace(/^﻿/, ""); // remove BOM se houver
-    const json = JSON.parse(clean);
-    loadAndRender(json);
-  }catch(e){
-    console.error(e);
-    document.getElementById('msg').textContent = `Erro ao ler arquivo: ${e.message}`;
-    alert("Arquivo inválido.
-
-"+e.message);
-  }
-});
-
-$("#btnDemo").addEventListener("click", ()=>{
-  const demo = {
-    lists:[{id:"l1",name:"Dev"},{id:"l2",name:"Concluído"},{id:"l3",name:"Backlog"},{id:"l4",name:"Acompanha Resultados "}],
-    members:[{id:"m1",fullName:"ricardo.michelin"},{id:"m2",fullName:"Beatriz Cristina Causs Barbieri"}],
-    checklists:[{idCard:"c1",checkItems:[{state:"complete"},{state:"complete"},{state:"incomplete"}]},{idCard:"c2",checkItems:[{state:"complete"},{state:"complete"}]}],
-    cards:[
-      {id:"c1",idList:"l1",name:"Integração API X",due:"2025-09-20",idMembers:["m1"],labels:[{name:"Urgente"}]},
-      {id:"c2",idList:"l2",name:"Entrega Módulo Y",due:"2025-08-30",idMembers:["m2"],labels:[{name:"Prioridade"}]},
-      {id:"c3",idList:"l3",name:"Backlog",due:null,idMembers:["m2"],labels:[]},
-      {id:"c4",idList:"l4",name:"Estudo Z",due:null,idMembers:[],labels:[{name:"Crítico"}]}
-    ]
-  }; loadAndRender(demo);
-});
-
-$("#btnReset").addEventListener("click", ()=>{
-  LAST_RAW = null; $("#kpi-valid").textContent = "–"; $("#kpi-valid-pct").textContent = "–";
-  $("#kpi-done").textContent = "–"; $("#kpi-done-pct").textContent = "–";
-  $("#members").innerHTML = ""; $("#kanban").innerHTML = ""; $("#projects tbody").innerHTML = ""; $("#totalRows").textContent = 0; fileInput.value = ""; fileLabel.textContent = "Selecionar JSON do Trello";
-  document.getElementById('msg').textContent = "Pronto para carregar um JSON do Trello…";
-});
-
-// Filtro rápido
-filterInput.addEventListener("input", ()=>{
-  const q = filterInput.value.trim().toLowerCase();
-  if(!q){ renderProjects(CURRENT_ROWS); return; }
-  const filtered = CURRENT_ROWS.filter(r => (r.name||"").toLowerCase().includes(q));
-  renderProjects(filtered);
-});
-
-// Ordenação por progresso (toggle desc/asc)
-let sortAsc = false;
-$("th[data-sort='progress']").addEventListener("click", ()=>{
-  sortAsc = !sortAsc;
-  const sorted = CURRENT_ROWS.slice().sort((a,b)=>{
-    const ap = (a.progress ?? -1); const bp = (b.progress ?? -1);
-    return sortAsc ? (ap - bp) : (bp - ap);
-  });
-  renderProjects(sorted);
-});
-
-// === Produção (GitHub Pages) ===
-// Auto-carregar ./projetos.json quando houver ?auto=1 na URL e o site estiver em http(s).
-(async function(){
-  try{
-    const msg = document.getElementById('msg');
-    const params = new URLSearchParams(location.search);
-    const auto = params.get('auto');
-    if (auto === '1' && /^https?:/i.test(location.protocol)){
-      const res = await fetch('./projetos.json?nocache=' + Date.now(), {cache:'no-cache'});
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      const json = await res.json();
-      loadAndRender(json);
-      if(msg) msg.textContent = 'Arquivo carregado automaticamente (./projetos.json)';
-    }
-  }catch(e){
-    console.error(e);
-    const msg = document.getElementById('msg');
-    if(msg) msg.textContent = 'Falha no auto-carregamento: ' + e.message;
-  }
-})();
-
-// Botão "Abrir projetos.json (pasta)" – funciona em produção (http) e tenta mesmo em file:// com aviso.
-(function(){
-  const btn = document.getElementById('btnFetchLocal');
-  if(!btn) return;
-  btn.addEventListener('click', async ()=>{
-    const msg = document.getElementById('msg');
-    try{
-      if (location.protocol === 'file:') {
-        if(msg) msg.textContent = 'Aviso: aberto via file://. Alguns navegadores bloqueiam leitura local. Prefira abrir via http.';
-      }
-      const res = await fetch('./projetos.json?nocache='+Date.now(), {cache:'no-cache'});
-      if(!res.ok){ throw new Error('HTTP '+res.status+' ao buscar ./projetos.json'); }
-      const json = await res.json();
-      loadAndRender(json);
-      if(msg) msg.textContent = 'Arquivo carregado: ./projetos.json';
-    }catch(e){
-      console.error(e);
-      if(msg) msg.textContent = 'Falha ao carregar ./projetos.json: ' + e.message;
-      alert('Não foi possível ler ./projetos.json.
-
-Dicas:
-• Garanta que projetos.json está na MESMA pasta do HTML.
-• Publique em http(s) (ex.: GitHub Pages) ou use Selecionar JSON.');
-    }
-  });
-})();
+// Erros globais
+window.addEventListener('error', function(e){ setMsg('Erro de script: '+(e && e.message? e.message : 'desconhecido')); });
+window.addEventListener('unhandledrejection', function(e){ var m=(e && e.reason && (e.reason.message||e.reason))||'desconhecido'; setMsg('Erro assíncrono: '+m); });
 </script>
 </body>
 </html>
