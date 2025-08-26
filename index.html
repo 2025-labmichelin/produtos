@@ -1,0 +1,542 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard – Neoenergia × Wittel</title>
+<style>
+  :root{
+    --bg:#0b0c0e;
+    --card:#121418;
+    --muted:#98a2b3;
+    --text:#e6e7e9;
+    --accent:#22c55e;   /* verde suave (clean) */
+    --accent-2:#60a5fa; /* azul suave */
+    --warn:#f59e0b;
+    --danger:#ef4444;
+    --ok:#10b981;
+    --chip:#1b1f27;
+    --stroke:#1f2430;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+    line-height:1.5;
+  }
+  header{
+    padding:24px 20px; border-bottom:1px solid var(--stroke);
+    display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;
+  }
+  .brand{display:flex; align-items:center; gap:12px}
+  .brand h1{font-size:18px; margin:0}
+  .actions{display:flex; gap:8px; flex-wrap:wrap}
+  button,input[type="file"]::file-selector-button{
+    background:var(--accent-2); color:#0b1220; border:none; padding:10px 14px; border-radius:10px;
+    font-weight:600; cursor:pointer;
+  }
+  input[type="file"]{
+    color:var(--muted);
+    background:var(--card); border:1px dashed var(--stroke); padding:8px; border-radius:10px;
+  }
+  main{padding:22px; max-width:1400px; margin:0 auto;}
+  .grid{display:grid; gap:16px}
+  .cols-3{grid-template-columns:repeat(3, minmax(0,1fr))}
+  .cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
+  @media (max-width:1100px){.cols-3{grid-template-columns:1fr}}
+  @media (max-width:900px){.cols-2{grid-template-columns:1fr}}
+
+  .card{
+    background:var(--card); border:1px solid var(--stroke);
+    border-radius:16px; padding:16px 16px 12px;
+  }
+  .card h2{
+    margin:0 0 10px; font-size:16px; font-weight:700; letter-spacing:.2px;
+  }
+  .pill{
+    display:inline-flex; align-items:center; gap:8px; padding:6px 10px; border-radius:999px;
+    background:var(--chip); color:var(--muted); font-size:12px;
+    border:1px solid var(--stroke);
+  }
+  .kpi{
+    display:flex; align-items:baseline; justify-content:space-between; border-top:1px dashed var(--stroke);
+    padding-top:10px; margin-top:10px
+  }
+  .kpi .big{font-size:28px; font-weight:800}
+  .muted{color:var(--muted)}
+  .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+
+  /* Kanban tiles */
+  .kanban-list{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
+  @media (max-width:1100px){.kanban-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:680px){.kanban-list{grid-template-columns:1fr}}
+  .tile{
+    background:#0e1116; border:1px solid var(--stroke); border-radius:14px; padding:12px;
+  }
+  .tile .name{font-weight:700; margin:0 0 6px}
+  .tile .bar{height:8px; background:#1c2330; border-radius:999px; overflow:hidden}
+  .tile .fill{height:8px; background:linear-gradient(90deg, var(--accent-2), #8b5cf6)}
+  .tile .foot{display:flex; justify-content:space-between; margin-top:6px; color:var(--muted); font-size:12px}
+
+  /* Members bars */
+  .bars{display:flex; flex-direction:column; gap:10px; margin-top:6px}
+  .bar-outer{height:12px; background:#10151e; border:1px solid var(--stroke); border-radius:999px; overflow:hidden}
+  .bar-inner{height:12px; background:linear-gradient(90deg, var(--accent), #4ade80)}
+
+  /* Table */
+  table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14px}
+  th, td{padding:10px 8px; border-bottom:1px solid var(--stroke); vertical-align:top}
+  th{color:var(--muted); font-weight:600; text-align:left}
+  tr:last-child td{border-bottom:none}
+  .tag{
+    display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px;
+    background:#0f1722; border:1px solid var(--stroke); color:var(--muted)
+  }
+  .tag.ok{background:rgba(16,185,129,.1); color:#22c55e; border-color:rgba(16,185,129,.2)}
+  .tag.warn{background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2)}
+  .tag.danger{background:rgba(239,68,68,.1); color:#ef4444; border-color:rgba(239,68,68,.2)}
+  .stack{display:flex; gap:6px; flex-wrap:wrap}
+  .right{float:right}
+  .small{font-size:12px}
+  .sep{height:1px; background:var(--stroke); margin:8px 0 4px}
+  .help{font-size:12px; color:var(--muted)}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <span class="pill">Neoenergia × Wittel</span>
+      <h1>Dashboard</h1>
+    </div>
+    <div class="actions">
+      <label class="pill" title="Selecione o arquivo JSON exportado do Trello">
+        <input id="fileInput" type="file" accept=".json" style="display:none">
+        Carregar JSON
+      </label>
+      <button id="btnDemo" title="Carregar exemplo mínimo embutido">Carregar exemplo</button>
+    </div>
+  </header>
+
+  <main class="grid cols-2">
+    <!-- KPIs -->
+    <section class="card">
+      <h2>Resumo</h2>
+      <div id="kpis" class="grid cols-2">
+        <div class="card">
+          <div class="row">
+            <span class="pill">Cards válidos</span>
+          </div>
+          <div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <span class="pill">Finalizados</span>
+          </div>
+          <div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div>
+        </div>
+      </div>
+      <div class="sep"></div>
+      <div class="help">
+        Regras ativas: desconsidera <b>Painel</b> (inteira) e cards cujo <b>name</b> é igual ao <b>name</b> da lista. 
+        <br/>Fora do fluxo: <b>Backlog</b>, <b>Suspenso</b>, <b>Cancelado</b>. Finalizados: <b>Concluido</b>, <b>Acompanha Resultado</b>.
+      </div>
+    </section>
+
+    <!-- Members -->
+    <section class="card">
+      <h2>Membros</h2>
+      <div class="help">Nomes padronizados e em ordem alfabética.</div>
+      <div id="members" class="bars"></div>
+    </section>
+
+    <!-- Kanban -->
+    <section class="card" style="grid-column:1 / -1">
+      <div class="row">
+        <h2 style="margin-right:auto">Kanban</h2>
+        <span class="pill small">Somente listas ativas</span>
+      </div>
+      <div id="kanban" class="kanban-list"></div>
+    </section>
+
+    <!-- Projects table -->
+    <section class="card" style="grid-column:1 / -1">
+      <div class="row">
+        <h2>Projetos (Progresso %)</h2>
+        <span class="help">Ordenado por Progresso decrescente. Itens fora do fluxo aparecem no final.</span>
+      </div>
+      <table id="projects">
+        <thead>
+          <tr>
+            <th>Projeto</th>
+            <th>Lista</th>
+            <th>Responsável</th>
+            <th>Entrega</th>
+            <th>PUC</th>
+            <th class="right">Progresso</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+<script>
+/* ==============================
+   CONFIGURAÇÕES & REGRAS
+============================== */
+
+// Ordem e ativação das listas (Kanban)
+const ORDERED_ACTIVE_LISTS = [
+  "A fazer",
+  "Estudo Téc/RN",
+  "Levantamento de esforço",
+  "Aprovação de esforço",
+  "Construção Crono",
+  "Construção da EF",
+  "Validação da EF",
+  "Debito Técnico",
+  "Dev",
+  "Homologação",
+  "Certificação",
+  "Deploy",
+  "Acompanha Resultado",
+  "Concluido"
+];
+
+// Fora do fluxo (aparecem no fim da tabela e não entram em lead time)
+const OUT_OF_FLOW = new Set(["Backlog", "Suspenso", "Cancelado"]);
+
+// Finalizados
+const DONE_LISTS = new Set(["Concluido", "Acompanha Resultado"]);
+
+// Remoção de ruído: excluir lista Painel por completo
+const EXCLUDE_FULL_LISTS = new Set(["Painel"]);
+
+// Normalização de nomes de membros
+const MEMBER_MAP = new Map([
+  ["Beatriz Cristina Causs Barbieri","Beatriz Causs"],
+  ["ricardo.michelin","Ricardo Michelin"],
+  ["Renan mora rodrigues da silva","Renan Mora"],
+  ["Nataly Rubi Cardoso","Nataly Cardoso"],
+  ["mariany.felix","Mariany Felix"],
+  ["patricia.tasseli","Patricia Tasseli"]
+]);
+
+/* ==============================
+   UTILITÁRIOS
+============================== */
+function normalizeMember(raw){
+  if(!raw) return "—";
+  const key = String(raw).trim();
+  return MEMBER_MAP.get(key) || titleCaseLike(key);
+}
+function titleCaseLike(str){
+  // se vier no formato login (com ponto), tenta capitalizar
+  if(str.includes(".")){
+    return str.split(".").map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(" ");
+  }
+  // capitaliza palavras (respeitando preposições simples)
+  return str.split(" ").map(w=>{
+    if(!w) return w;
+    const low = ["de","da","do","dos","das","e","ou","em","no","na"];
+    if(low.includes(w.toLowerCase())) return w.toLowerCase();
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }).join(" ");
+}
+function fmtPct(n){
+  if(isNaN(n)) return "—";
+  return (Math.round(n*1000)/10).toFixed(1).replace(".0","") + "%";
+}
+function fmtDate(s){
+  if(!s) return "—";
+  const d = new Date(s);
+  if(isNaN(d)) return "—";
+  const dd = String(d.getDate()).padStart(2,"0");
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const yyyy = d.getFullYear();
+  return `${dd}/${mm}/${yyyy}`;
+}
+function tagForPUC(puc){
+  // PUC: Crítico, Urgente, Prioridade (em ordem de severidade)
+  const v = (puc||"").toLowerCase();
+  if(v === "crítico" || v === "critico") return `<span class="tag danger">Crítico</span>`;
+  if(v === "urgente") return `<span class="tag warn">Urgente</span>`;
+  if(v === "prioridade") return `<span class="tag ok">Prioridade</span>`;
+  return `<span class="tag">—</span>`;
+}
+
+/* ==============================
+   PARSE do JSON estilo Trello
+   Espera objetos com:
+   - lists: [{id, name, closed}]
+   - cards: [{id, idList, name, due, idMembers, labels, checklists?}]
+   - members: [{id, fullName or username}]
+   - checklists: [{idCard, checkItems:[{state}]}]  (alguns exports trazem junto)
+============================== */
+function ingestTrello(raw){
+  // Aceita dois formatos comuns:
+  // a) export completo com lists/cards/members/checklists
+  // b) lista de cards já enriquecidos (projetos.json), com campos semelhantes
+  let listsById = new Map();
+  let membersById = new Map();
+  let checklistsByCard = new Map();
+  let cards = [];
+
+  if(Array.isArray(raw.cards) && Array.isArray(raw.lists)){
+    // Export Trello clássico
+    raw.lists.forEach(l=>{
+      listsById.set(l.id, {id:l.id, name: (l.name||"").trim(), closed: !!l.closed});
+    });
+    // membros
+    if(Array.isArray(raw.members)){
+      raw.members.forEach(m=>{
+        const name = m.fullName || m.username || m.name || "";
+        membersById.set(m.id, normalizeMember(name));
+      });
+    }
+    // checklists
+    if(Array.isArray(raw.checklists)){
+      raw.checklists.forEach(cl=>{
+        const items = Array.isArray(cl.checkItems) ? cl.checkItems : [];
+        const done = items.filter(i=>String(i.state).toLowerCase()==="complete").length;
+        const total = items.length;
+        const current = checklistsByCard.get(cl.idCard) || {done:0, total:0};
+        checklistsByCard.set(cl.idCard, {done: current.done+done, total: current.total+total});
+      });
+    }
+    cards = (raw.cards||[]).map(c=>{
+      const list = listsById.get(c.idList);
+      const listName = list ? list.name : (c.listName || "");
+      // labels pode vir como [{name}] ou apenas nomes
+      let puc = null;
+      if(Array.isArray(c.labels)){
+        const names = c.labels.map(l => (l.name||"").toLowerCase());
+        if(names.includes("crítico") || names.includes("critico")) puc = "Crítico";
+        else if(names.includes("urgente")) puc = "Urgente";
+        else if(names.includes("prioridade")) puc = "Prioridade";
+      } else if(typeof c.puc === "string"){ puc = c.puc; }
+
+      // responsável: primeiro membro
+      let owner = "—";
+      if(Array.isArray(c.idMembers) && c.idMembers.length){
+        const m = membersById.get(c.idMembers[0]);
+        if(m) owner = m;
+      } else if(c.member){ owner = normalizeMember(c.member); }
+
+      // progresso via checklists agregados
+      const agg = checklistsByCard.get(c.id) || {done:0,total:0};
+      const progress = agg.total>0 ? agg.done/agg.total : null;
+
+      return {
+        id: c.id,
+        name: (c.name||"").trim(),
+        list: listName,
+        due: c.due || c.dueDate || c.dataEntrega || null,
+        owner,
+        puc,
+        progress
+      };
+    });
+
+  } else if(Array.isArray(raw)){ 
+    // Array de cards enriquecidos (formato customizado anterior)
+    cards = raw.map(c=>{
+      return {
+        id: c.id || c.cardId || Math.random().toString(36).slice(2),
+        name: (c.name||c.card||"").trim(),
+        list: (c.list||c.lista||"").trim(),
+        due: c.due || c.dueDate || c.dataEntrega || null,
+        owner: normalizeMember(c.owner||c.responsavel||c.member||""),
+        puc: c.puc || c.PUC || null,
+        progress: (typeof c.progressPct==="number") ? (c.progressPct/100) :
+                  (typeof c.progress === "number") ? c.progress : null
+      };
+    });
+  } else {
+    throw new Error("Formato de JSON não reconhecido.");
+  }
+
+  // 1) remove listas excluídas por completo
+  cards = cards.filter(c => !EXCLUDE_FULL_LISTS.has((c.list||"").trim()));
+
+  // 2) remove cards cujo name == list (ruído)
+  cards = cards.filter(c => (c.name||"") !== (c.list||""));
+
+  // retorna estrutura padronizada
+  return {cards};
+}
+
+/* ==============================
+   MÉTRICAS E RENDER
+============================== */
+
+function compute(cards){
+  const totalValid = cards.length;
+
+  // Done
+  const doneCount = cards.filter(c => DONE_LISTS.has(c.list)).length;
+
+  // Kanban (apenas listas ativas, na ordem definida)
+  const activeSet = new Set(ORDERED_ACTIVE_LISTS);
+  const byList = new Map();
+  ORDERED_ACTIVE_LISTS.forEach(name=>byList.set(name,0));
+  cards.forEach(c=>{
+    if(activeSet.has(c.list)){
+      byList.set(c.list, (byList.get(c.list)||0)+1);
+    }
+  });
+
+  // Members (normalizados, ordem alfabética)
+  const byMember = new Map();
+  cards.forEach(c=>{
+    const m = c.owner || "—";
+    byMember.set(m, (byMember.get(m)||0)+1);
+  });
+  const members = Array.from(byMember.entries())
+                       .map(([name,count])=>({name, count}))
+                       .sort((a,b)=>a.name.localeCompare(b.name));
+
+  // Tabela de projetos:
+  // - ordenar por progresso desc
+  // - fora do fluxo (Backlog/Suspenso/Cancelado) empurrar para o fim
+  const sorted = [...cards].sort((a,b)=>{
+    const aOut = OUT_OF_FLOW.has(a.list) ? 1 : 0;
+    const bOut = OUT_OF_FLOW.has(b.list) ? 1 : 0;
+    if(aOut !== bOut) return aOut - bOut; // quem está no fluxo primeiro
+    const ap = (a.progress ?? -1);
+    const bp = (b.progress ?? -1);
+    return (bp - ap); // desc
+  });
+
+  return { totalValid, doneCount, byList, members, sorted };
+}
+
+function renderKpis({totalValid, doneCount}, universe){
+  const total = universe; // universo considerado = total de cards após filtros
+  document.getElementById("kpi-valid").textContent = totalValid;
+  document.getElementById("kpi-valid-pct").textContent = total ? fmtPct(totalValid/total) : "—";
+  document.getElementById("kpi-done").textContent = doneCount;
+  document.getElementById("kpi-done-pct").textContent = totalValid ? fmtPct(doneCount/totalValid) : "—";
+}
+
+function renderKanban(byList, totalValid){
+  const wrap = document.getElementById("kanban");
+  wrap.innerHTML = "";
+  ORDERED_ACTIVE_LISTS.forEach(name=>{
+    const qty = byList.get(name)||0;
+    const pct = totalValid ? (qty/totalValid) : 0;
+    const el = document.createElement("div");
+    el.className = "tile";
+    el.innerHTML = `
+      <div class="name">${name}</div>
+      <div class="bar"><div class="fill" style="width:${Math.round(pct*100)}%"></div></div>
+      <div class="foot"><span>${qty} cards</span><span>${fmtPct(pct)}</span></div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+function renderMembers(members, maxCount){
+  const wrap = document.getElementById("members");
+  wrap.innerHTML = "";
+  if(!members.length){
+    wrap.innerHTML = `<div class="help">Sem responsáveis informados.</div>`;
+    return;
+  }
+  const universe = members.reduce((s,m)=>s+m.count,0);
+  members.forEach(m=>{
+    const pct = universe ? (m.count/universe) : 0;
+    const el = document.createElement("div");
+    el.innerHTML = `
+      <div class="row" style="justify-content:space-between">
+        <div>${m.name}</div>
+        <div class="muted small">${m.count} • ${fmtPct(pct)}</div>
+      </div>
+      <div class="bar-outer"><div class="bar-inner" style="width:${Math.round(pct*100)}%"></div></div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+function renderProjects(rows){
+  const tbody = document.querySelector("#projects tbody");
+  tbody.innerHTML = "";
+  rows.forEach(c=>{
+    const statusTag = OUT_OF_FLOW.has(c.list) ? `<span class="tag warn">Fora do fluxo</span>` :
+                       DONE_LISTS.has(c.list)   ? `<span class="tag ok">Finalizado</span>` :
+                                                   `<span class="tag">Andamento</span>`;
+    const prog = (c.progress==null) ? "—" : fmtPct(c.progress);
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight:700">${c.name||"—"}</div>
+        <div class="stack small muted">${statusTag}</div>
+      </td>
+      <td>${c.list||"—"}</td>
+      <td>${c.owner||"—"}</td>
+      <td>${fmtDate(c.due)}</td>
+      <td>${tagForPUC(c.puc)}</td>
+      <td class="right" style="font-weight:700">${prog}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ==============================
+   ORQUESTRAÇÃO
+============================== */
+let LAST_RAW = null;
+
+function loadAndRender(raw){
+  const {cards} = ingestTrello(raw);
+  LAST_RAW = raw;
+
+  const metrics = compute(cards);
+  renderKpis(metrics, /*universe*/ cards.length);
+  renderKanban(metrics.byList, metrics.totalValid);
+  renderMembers(metrics.members);
+  renderProjects(metrics.sorted);
+}
+
+/* ==============================
+   HANDLERS UI
+============================== */
+const inputFile=document.getElementById("fileInput");
+inputFile.addEventListener("change", async (ev)=>{
+  const f = ev.target.files?.[0];
+  if(!f) return;
+  try{
+    const txt = await f.text();
+    const json = JSON.parse(txt);
+    loadAndRender(json);
+  }catch(e){
+    alert("Não consegui ler este JSON. Verifique o arquivo.\n\n"+e.message);
+  }
+});
+document.getElementById("btnDemo").addEventListener("click", ()=>{
+  // exemplo mínimo offline para testar layout
+  const demo = {
+    lists:[{id:"l1",name:"Dev"},{id:"l2",name:"Concluido"},{id:"l3",name:"Backlog"}],
+    members:[{id:"m1",fullName:"ricardo.michelin"},{id:"m2",fullName:"Beatriz Cristina Causs Barbieri"}],
+    checklists:[
+      {idCard:"c1",checkItems:[{state:"complete"},{state:"complete"},{state:"incomplete"}]},
+      {idCard:"c2",checkItems:[{state:"complete"},{state:"complete"}]}
+    ],
+    cards:[
+      {id:"c1",idList:"l1",name:"Integração API X",due:"2025-09-20",idMembers:["m1"],labels:[{name:"Urgente"}]},
+      {id:"c2",idList:"l2",name:"Entrega Módulo Y",due:"2025-08-30",idMembers:["m2"],labels:[{name:"Prioridade"}]},
+      {id:"c3",idList:"l3",name:"Backlog",due:null,idMembers:["m2"],labels:[]}, /* será removido por name==list */
+      {id:"c4",idList:"l3",name:"Estudo Z",due:null,idMembers:[],labels:[{name:"Crítico"}]}
+    ]
+  };
+  loadAndRender(demo);
+});
+
+// inicialização visual
+(function boot(){
+  // mostra placeholders vazios até carregar JSON
+})();
+</script>
+</body>
+</html>
