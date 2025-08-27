@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard – Neoenergia × Wittel</title>
+  <title>Dashboard – Projetos</title>
   <style>
     :root{
       /* Light theme */
@@ -14,13 +14,13 @@
       --text:#0F172A;         /* texto principal */
       --muted:#475569;        /* texto secundário */
 
-      /* Semânticas (Neoenergia) */
+      /* Semânticas */
       --ok:#00A443;           /* Concluído */
       --warn:#F68C1B;         /* Fora do fluxo / Urgente */
       --danger:#EF4444;       /* Atrasos / Crítico */
       --primary:#2CB6FF;      /* Prioridade / CTAs */
 
-      /* Legados/auxiliares */
+      /* Auxiliares */
       --accent:#2CB6FF;       /* gradientes leves */
       --accent-2:#2CB6FF;     /* botão principal */
       --chip:#F1F5F9;
@@ -46,12 +46,17 @@
     main{padding:22px; max-width:1400px; margin:0 auto}
     .grid{display:grid; gap:16px}
     .cols-2{grid-template-columns:repeat(2, minmax(0,1fr))}
-    @media (max-width:900px){.cols-2{grid-template-columns:1fr}}
+    .cols-4{grid-template-columns:repeat(4, minmax(0,1fr))}
+    .cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
+    @media (max-width:1100px){.cols-2{grid-template-columns:1fr}.cols-4{grid-template-columns:repeat(2,minmax(0,1fr))}.cols-5{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (max-width:680px){.cols-4{grid-template-columns:1fr}.cols-5{grid-template-columns:1fr}}
 
     .card{background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:16px}
     .card h2{margin:0 0 10px; font-size:16px; font-weight:700}
     .muted{color:var(--muted)}
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row{display:flex; gap:8px; align-items:baseline; flex-wrap:wrap}
+    .meta{font-size:13px;font-weight:500;color:var(--muted)}
+    .meta::before{content:'·';margin:0 6px 0 2px;color:var(--muted)}
 
     .kpi{display:flex; align-items:baseline; justify-content:space-between; border-top:1px dashed var(--stroke); padding-top:10px; margin-top:10px}
     .kpi .big{font-size:28px; font-weight:800}
@@ -83,19 +88,18 @@
     .badge{display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:999px; font-size:11px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
     .badge.new{background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.3)}
     .overcap{color:#fca5a5}
-  .status-pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted)}
-  .date.overdue{color:var(--danger);font-weight:700}
-#projects.table-sticky thead th{position:sticky;top:0;background:var(--card);z-index:2;box-shadow:0 2px 0 0 var(--stroke)}
-#projects tbody tr:nth-child(odd){background:rgba(0,0,0,.02)}
-#projects tbody tr:hover{background:rgba(0,0,0,.04)}
-  .hero{position:relative; border-radius:16px; padding:24px; color:#fff; background:linear-gradient(90deg,#0B5FA8 0%, #1DA1A9 55%, #33C17C 100%);} 
-.hero::before{content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(0deg, rgba(0,0,0,.16), rgba(0,0,0,.16));}
-.hero .content{position:relative; display:flex; gap:16px; align-items:flex-start; justify-content:space-between}
-.hero h2{margin:0 0 6px; font-size:20px; font-weight:800; letter-spacing:-.2px}
-.hero p{margin:0; font-size:14px; opacity:.95; max-width:56ch}
-.kpi-hero{display:flex; gap:24px; align-items:center}
-.kpi-hero .num{font-size:32px; font-weight:800; line-height:1}
-.kpi-hero .label{font-size:12px; opacity:.92; letter-spacing:.2px}
+    .status-pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted)}
+    .date.overdue{color:var(--danger);font-weight:700}
+    .date.stale{color:var(--warn);font-weight:700}
+
+  /* === Ajustes de layout dos KPIs (disposição e tamanho) === */
+#kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px}
+#kpis .card{padding:12px; border-radius:12px; min-height:116px}
+#kpis .row{margin-bottom:4px}
+#kpis .kpi{margin-top:8px; padding-top:8px}
+#kpis .kpi .big{font-size:32px}
+#kpis .kpi .muted{font-size:13px}
+
 </style>
 </head>
 <body>
@@ -116,38 +120,41 @@
   </details>
 
   <main id="mainContent" class="grid cols-2">
-    <section id="heroBanner" class="hero" style="grid-column:1 / -1">
-      <div class="content">
-        <div>
-          <h2>Visão Geral dos Projetos</h2>
-          <p>Acompanhe o progresso, identifique gargalos e otimize o desempenho da equipe</p>
-        </div>
-      </div>
-    </section>
-    <section class="card" aria-labelledby="resumo-h2">
-      <h2 id="resumo-h2">Resumo</h2>
-      <div id="kpis" class="grid cols-2">
-        <div class="card"><div class="row"><span class="tag">Cards válidos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>
-        <div class="card"><div class="row"><span class="tag">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>
-      </div>
-      <p id="fileHelp" class="muted" style="margin-top:8px">
-  Regras: exclui lista Painel e cards cujo name = nome da lista.<br>
-  Fora do fluxo: Backlog, Suspenso, Cancelado.<br>
-  Finalizados: Concluído, Acompanha Resultados.
-</p>
+
+    <!-- KPIs -->
+    <section id="kpis" class="grid cols-5" aria-label="KPIs"></section>
+
+    <!-- Fora do fluxo -->
+    <section class="card" style="grid-column:1 / -1" aria-labelledby="out-h2">
+      <div class="row"><h2 id="out-h2">Fora do fluxo</h2><span class="meta">Neoenergia</span></div>
+      <div id="kanban-out" class="grid cols-4" role="list"></div>
     </section>
 
-    <section class="card" aria-labelledby="membros-h2">
-      <h2 id="membros-h2">Membros</h2>
-      
+    <!-- Pré-projeto -->
+    <section class="card" style="grid-column:1 / -1" aria-labelledby="pre-h2">
+      <div class="row"><h2 id="pre-h2">Pré-projeto</h2><span class="meta">CSM Wittel</span></div>
+      <div id="kanban-pre" class="grid cols-4" role="list"></div>
+    </section>
+
+    <!-- Projetos (execução) -->
+    <section class="card" style="grid-column:1 / -1" aria-labelledby="exec-h2">
+      <div class="row"><h2 id="exec-h2">Projetos (execução)</h2></div>
+      <div id="kanban-exec" class="grid cols-4" role="list"></div>
+    </section>
+
+    <!-- CX -->
+    <section class="card" style="grid-column:1 / -1" aria-labelledby="cx-h2">
+      <div class="row"><h2 id="cx-h2">CX</h2></div>
+      <div id="kanban-cx" class="grid cols-4" role="list"></div>
+    </section>
+
+    <!-- Membros -->
+    <section class="card" style="grid-column:1 / -1" aria-labelledby="members-h2">
+      <div class="row"><h2 id="members-h2">Membros</h2></div>
       <div id="members" class="bars"></div>
     </section>
 
-    <section class="card" style="grid-column:1 / -1" aria-labelledby="kanban-h2">
-      <div class="row"><h2 id="kanban-h2" style="margin-right:auto">Kanban</h2><span class="tag">Somente listas ativas</span></div>
-      <div id="kanban" class="kanban-list" role="list"></div>
-    </section>
-
+    <!-- Tabela de projetos -->
     <section class="card" style="grid-column:1 / -1" aria-labelledby="projetos-h2">
       <div class="row"><h2 id="projetos-h2">Projetos (Progresso %)</h2></div>
       <div class="row" style="justify-content:flex-end; align-items:center">
@@ -162,13 +169,15 @@
             <th data-sort="due">Entrega</th>
             <th data-sort="finalDue">Entrega Final</th>
             <th data-sort="puc">PUC</th>
-            <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar">Progresso ▲▼</th>
+            <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar por Progresso">Progresso ▲▼</th>
+            <th data-sort="updatedAt">Atualizado</th>
             <th data-sort="url">Card</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </section>
+
   </main>
 
   <footer style="padding:18px 22px; border-top:1px solid var(--stroke); color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px">
@@ -182,10 +191,7 @@
 function $(sel,root){return (root||document).querySelector(sel);} 
 function $$(sel,root){return Array.from((root||document).querySelectorAll(sel));}
 function logd(){var s=Array.from(arguments).map(function(x){try{return typeof x==='string'?x:JSON.stringify(x);}catch(_){return String(x);}}).join(' '); var el=$('#dbgLog'); if(el){el.textContent+=s+'\n'; el.scrollTop=el.scrollHeight;} if(window.console&&console.debug){console.debug('[DBG]',s);} }
-function setMsg(t){
-  var el = $('#msg'); if(el){ el.textContent = t; }
-  var hs = $('#hdrStatus'); if(hs){ hs.textContent = t; }
-}
+function setMsg(t){ var el=$('#msg'); if(el){ el.textContent=t; } var hs=$('#hdrStatus'); if(hs){ hs.textContent=t; } }
 
 function stripAccents(s){return s? s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
 function norm(s){s=String(s||'').trim(); s=s.replace(/\s+/g,' '); var k=stripAccents(s).toLowerCase(); if(k==='acompanha resultado'||k==='acompanha resultados') return 'acompanha resultados'; if(k==='concluido'||k==='concluído') return 'concluido'; if(k==='painel') return 'painel'; if(k==='backlog') return 'backlog'; if(k==='suspenso') return 'suspenso'; if(k==='cancelado') return 'cancelado'; return k;}
@@ -194,38 +200,23 @@ function titleCaseLike(str){if(!str) return ''; var low=['de','da','do','dos','d
 function normalizeMember(raw){if(!raw) return '—'; var key=String(raw).trim(); return MEMBER_MAP.get(key)||titleCaseLike(key);} 
 function fmtPct(n){if(isNaN(n)||n==null) return '—'; var v=Math.round(n*1000)/10; return (v.toFixed(1).replace('.0',''))+'%';}
 function fmtDate(s){if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return '—'; var dd=String(d.getDate()).padStart(2,'0'); var mm=String(d.getMonth()+1).padStart(2,'0'); var yyyy=d.getFullYear(); return dd+'/'+mm+'/'+yyyy;}
-function tagForPUC(puc){
-  var v=String(puc||'').toLowerCase();
-  if(v==='crítico'||v==='critico') return '<span class="tag danger">Crítico</span>';
-  if(v==='urgente') return '<span class="tag warn">Urgente</span>';
-  if(v==='prioridade') return '<span class="tag info">Prioridade</span>';
-  return '<span class="tag">—</span>';
-}
+function tagForPUC(puc){ var v=String(puc||'').toLowerCase(); if(v==='crítico'||v==='critico') return '<span class="tag danger">Crítico</span>'; if(v==='urgente') return '<span class="tag warn">Urgente</span>'; if(v==='prioridade') return '<span class="tag info">Prioridade</span>'; return '<span class="tag">—</span>'; }
 // Regra: atrasado = tem due no passado e não está finalizado nem fora do fluxo
 function isOverdue(c){ try{ if(!c||!c.due) return false; if(DONE_LIST_KEYS.has(c.listKey)||OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d=new Date(c.due); if(isNaN(d)) return false; var today=new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
 // Regra: atrasado (final) = possui finalDue no passado e não está finalizado
-function isFinalOverdue(c){
-  try{
-    if(!c || !c.finalDue) return false;
-    if (DONE_LIST_KEYS.has(c.listKey) || OUT_OF_FLOW_KEYS.has(c.listKey)) return false;
-    var d = new Date(c.finalDue);
-    if (isNaN(d)) return false;
-    var today = new Date();
-    today.setHours(0,0,0,0);
-    return d < today;
-  }catch(_){ return false; }
-}
+function isFinalOverdue(c){ try{ if(!c || !c.finalDue) return false; if (DONE_LIST_KEYS.has(c.listKey) || OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d = new Date(c.finalDue); if (isNaN(d)) return false; var today = new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
 
 // ===== Config =====
+var STALE_DAYS = 10; // 'Sem atualização' quando última atualização for há >= 10 dias
 var ORDERED_ACTIVE_LABELS=[
-  'A fazer','Estudo Téc/RN','Levantamento de esforço','Aprovação de esforço','Construção Crono',
-  'Construção da EF','Validação da EF','Débito Técnico','Dev','Homologação','Certificação','Deploy',
-  'Acompanha Resultados','Concluído'
+  'A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço',
+  'Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)',
+  'Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'
 ];
 var ORDERED_ACTIVE_KEYS=ORDERED_ACTIVE_LABELS.map(norm);
 var OUT_OF_FLOW_KEYS=new Set(['Backlog','Suspenso','Cancelado'].map(norm));
 var DONE_LIST_KEYS=new Set(['Concluído','Acompanha Resultados'].map(norm));
-var EXCLUDE_FULL_LIST_KEYS=new Set(['Painel'].map(norm));
+var EXCLUDE_FULL_LIST_KEYS=new Set(['Painel','Manual de Utilização'].map(norm));
 var MEMBER_MAP=new Map([
   ['Beatriz Cristina Causs Barbieri','Beatriz Causs'],
   ['ricardo.michelin','Ricardo Michelin'],
@@ -235,7 +226,7 @@ var MEMBER_MAP=new Map([
   ['patricia.tasseli','Patricia Tasseli']
 ]);
 
-// members.json (opcional; não bloqueia nada)
+// members.json (opcional)
 var CONFIG={aliases:{},teams:{},capacity:{}};
 (function(){ try{ if(/^https?:/i.test(location.protocol)){ fetch('./members.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) return null; return r.json(); }).then(function(j){ if(!j) return; CONFIG.aliases=j.aliases||{}; CONFIG.teams=j.teams||{}; CONFIG.capacity=j.capacity||{}; Object.keys(CONFIG.aliases).forEach(function(alias){ MEMBER_MAP.set(alias, CONFIG.aliases[alias]); }); setMsg('Config de membros carregada'); }).catch(function(){/* ignora */}); } }catch(_){/* ignora */} })();
 
@@ -255,133 +246,235 @@ function parseDateFromText(text){
 
 // ===== Parse Trello JSON =====
 function ingestTrello(raw){
-  var listsById=new Map();
-  var membersById=new Map();
-  var checklistsByCard=new Map();
-  var finalDueByCard=new Map();
-  var cards=[];
+  try{
+    var listsById=new Map();
+    var membersById=new Map();
+    var checkAgg=new Map();        // idCard -> {done,total}
+    var finalDueByCard=new Map();  // idCard -> ISO string
+    var cards=[];
 
-  if(Array.isArray(raw.cards)&&Array.isArray(raw.lists)){
-    raw.lists.forEach(function(l){ listsById.set(l.id,{id:l.id,name:String(l.name||'').trim(),closed:!!l.closed}); });
-    if(Array.isArray(raw.members)) raw.members.forEach(function(m){ var name=m.fullName||m.username||m.name||''; membersById.set(m.id, normalizeMember(name)); });
-    if(Array.isArray(raw.checklists)) raw.checklists.forEach(function(cl){
-      var items=Array.isArray(cl.checkItems)?cl.checkItems:[];
-      // progresso agregado por card
-      var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length;
-      var total=items.length; var cur=checklistsByCard.get(cl.idCard)||{done:0,total:0};
-      checklistsByCard.set(cl.idCard,{done:cur.done+done,total:cur.total+total});
-      // extrair "Data de Entrega" (usa a MAIOR data válida entre os itens)
-      var clKey=norm(cl.name||'');
-      if(clKey.indexOf('data de entrega')>-1){
-        var best=null;
-        items.forEach(function(it){ var d=parseDateFromText(it && it.name); if(d){ if(!best || d>best) best=d; } });
-        if(best) finalDueByCard.set(cl.idCard, best.toISOString());
-      }
-    });
-    cards=(raw.cards||[]).filter(function(c){return !c.closed;}).map(function(c){
-      var list=listsById.get(c.idList); var listName=list?list.name:(c.listName||''); var listKey=norm(listName);
-      var puc=null; if(Array.isArray(c.labels)){ var names=c.labels.map(function(l){return (l.name||'').toLowerCase();}); if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico'; else if(names.indexOf('urgente')>-1) puc='Urgente'; else if(names.indexOf('prioridade')>-1) puc='Prioridade'; } else if(typeof c.puc==='string'){ puc=c.puc; }
-      var owner='—'; if(Array.isArray(c.idMembers)&&c.idMembers.length){ var m=membersById.get(c.idMembers[0]); if(m) owner=m; } else if(c.member){ owner=normalizeMember(c.member);} 
-      var agg=checklistsByCard.get(c.id)||{done:0,total:0}; var progress=agg.total>0? (agg.done/agg.total):null;
-      var finalDue=finalDueByCard.get(c.id)||null;
-      var url=c.url || (c.shortLink? ('https://trello.com/c/'+c.shortLink): null);
-      return { id:c.id, name:String(c.name||'').trim(), list:listName, listKey:listKey, due:c.due||c.dueDate||c.dataEntrega||null, finalDue:finalDue, owner:owner, puc:puc, progress:progress, url:url };
-    });
-  } else if(Array.isArray(raw)){
-    cards=raw.map(function(c){ var listName=(c.list||c.lista||'').trim(); return { id:c.id||c.cardId||Math.random().toString(36).slice(2), name:(c.name||c.card||'').trim(), list:listName, listKey:norm(listName), due:c.due||c.dueDate||c.dataEntrega||null, finalDue:c.finalDue||null, owner:normalizeMember(c.owner||c.responsavel||c.member||''), puc:c.puc||c.PUC||null, progress:(typeof c.progressPct==='number')?(c.progressPct/100): (typeof c.progress==='number')?c.progress:null, url:c.url||null }; });
-  } else { throw new Error('Formato de JSON não reconhecido.'); }
+    // --- Lists & Members
+    if(Array.isArray(raw.lists)){
+      raw.lists.forEach(function(l){ listsById.set(l.id,{id:l.id,name:String(l.name||'').trim(),closed:!!l.closed}); });
+    }
+    if(Array.isArray(raw.members)){
+      raw.members.forEach(function(m){ var name=m.fullName||m.username||m.name||''; membersById.set(m.id, normalizeMember(name)); });
+    }
 
-  // filtros
-  cards=cards.filter(function(c){return !EXCLUDE_FULL_LIST_KEYS.has(c.listKey);});
-  cards=cards.filter(function(c){return (c.name||'')!==(c.list||'');});
-  return {cards:cards};
+    // --- Checklists (progresso + Data de Entrega)
+    if(Array.isArray(raw.checklists)){
+      raw.checklists.forEach(function(cl){
+        var items=Array.isArray(cl.checkItems)? cl.checkItems : [];
+        var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length;
+        var total=items.length;
+        var cur=checkAgg.get(cl.idCard)||{done:0,total:0};
+        checkAgg.set(cl.idCard,{done:cur.done+done,total:cur.total+total});
+        var clKey=norm(cl.name||'');
+        if(clKey.indexOf('data de entrega')>-1){
+          var best=null;
+          items.forEach(function(it){ var d=parseDateFromText(it && it.name); if(d){ if(!best || d>best) best=d; } });
+          if(best) finalDueByCard.set(cl.idCard, best.toISOString());
+        }
+      });
+    }
+
+    // --- Cards
+    var rawOpenCount = Array.isArray(raw.cards)? raw.cards.filter(function(c){return !c.closed;}).length : 0;
+    if(Array.isArray(raw.cards)){
+      cards=raw.cards.filter(function(c){return !c.closed;}).map(function(c){
+        var list=listsById.get(c.idList);
+        var rawListName = list? list.name : (c.listName||'');
+        rawListName = String(rawListName||'').trim();
+        // normaliza sinônimos de listas para os rótulos canônicos do Kanban
+        (function(){
+          var pairs = [
+            ['Levantamento do Esforço','Levantamento de Esforço'],
+            ['Aprovação do Esforço','Aprovação de Esforço'],
+            ['Construção EF','Construção da EF'],
+            ['Confirmacao da EF (WTec)','Confirmação da EF (WTéc)'],
+            ['Confirmação EF (WTec)','Confirmação da EF (WTéc)'],
+            ['Validacao EF','Validação EF'],
+            ['A fazer','A Fazer']
+          ];
+          var k = norm(rawListName);
+          for (var i=0;i<pairs.length;i++){ if (norm(pairs[i][0])===k) { rawListName = pairs[i][1]; break; } }
+        })();
+        var listName = rawListName;
+        var listKey = norm(listName);
+        var puc=null;
+        if(Array.isArray(c.labels)){
+          var names=c.labels.map(function(l){return (l.name||'').toLowerCase();});
+          if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico';
+          else if(names.indexOf('urgente')>-1) puc='Urgente';
+          else if(names.indexOf('prioridade')>-1) puc='Prioridade';
+        } else if(typeof c.puc==='string'){ puc=c.puc; }
+        var owner='—';
+        if(Array.isArray(c.idMembers) && c.idMembers.length){ var m=membersById.get(c.idMembers[0]); if(m) owner=m; }
+        else if(c.member){ owner=normalizeMember(c.member); }
+        var agg=checkAgg.get(c.id)||{done:0,total:0}; var progress=agg.total>0? (agg.done/agg.total):null;
+        var finalDue=finalDueByCard.get(c.id)||null;
+        var dueVal=c.due||c.dueDate||c.dataEntrega||null;
+        var updatedAt = c.dateLastActivity || null; // somente atividade real
+        try { if (updatedAt) { var u=new Date(updatedAt); var today=new Date(); today.setHours(0,0,0,0); if (u>today) updatedAt=today.toISOString(); } } catch(_) {}
+        var url=c.url || (c.shortLink? ('https://trello.com/c/'+c.shortLink): null);
+        return { id:c.id, name:String(c.name||'').trim(), list:listName, listKey:listKey, due:dueVal, finalDue:finalDue, owner:owner, puc:puc, progress:progress, updatedAt:updatedAt, url:url };
+      });
+    }
+
+    // --- Regras de exclusão
+    cards=cards.filter(function(c){ return !EXCLUDE_FULL_LIST_KEYS.has(c.listKey); });
+    cards=cards.filter(function(c){ return norm(c.name) !== norm(c.list); }); // remove placeholders "nome == lista"
+
+    return {cards:cards, rawOpenCount: rawOpenCount};
+  }catch(err){ console.error('ingestTrello error:', err); throw err; }
 }
+
 
 // ===== Métricas & Render =====
-function compute(cards){
+function compute(cards, rawOpen){
+  // Grupos
+  var GROUP_OUT_LABELS = ['Backlog','Suspenso','Cancelado'];
+  var GROUP_PRE_LABELS = ['A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'];
+  var GROUP_EXEC_LABELS = ['Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'];
+  var GROUP_CX_LABELS  = ['Acompanha Resultados'];
+
   var totalValid=cards.length;
   var doneCount=cards.filter(function(c){return DONE_LIST_KEYS.has(c.listKey);}).length;
-  var byList=new Map(ORDERED_ACTIVE_KEYS.map(function(k){return [k,0];}));
+
+  // Kanban ativo (14 listas)
+  var byList=new Map(ORDERED_ACTIVE_LABELS.map(function(s){return [norm(s),0];}));
   cards.forEach(function(c){ if(byList.has(c.listKey)){ byList.set(c.listKey,(byList.get(c.listKey)||0)+1); } });
-  var byMember=new Map();
-  cards.forEach(function(c){ var m=c.owner||'—'; byMember.set(m,(byMember.get(m)||0)+1); });
-  var members=Array.from(byMember.entries()).map(function(e){return {name:e[0],count:e[1]};}).sort(function(a,b){return a.name.localeCompare(b.name);});
+  var activeCount = 0; byList.forEach(function(v){ activeCount += v||0; });
+
+  function buildGroup(labels){ var m=new Map(labels.map(function(s){return [norm(s),0];})); cards.forEach(function(c){ if(m.has(c.listKey)){ m.set(c.listKey,(m.get(c.listKey)||0)+1); } }); return m; }
+  var byOut = buildGroup(GROUP_OUT_LABELS);
+  var byPre = buildGroup(GROUP_PRE_LABELS);
+  var byExec = buildGroup(GROUP_EXEC_LABELS);
+  var byCx = buildGroup(GROUP_CX_LABELS);
+
   var sorted=cards.slice().sort(function(a,b){
-    var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0;
-    if(aOut!==bOut) return aOut-bOut; // em fluxo primeiro
-    var afo=isFinalOverdue(a)?1:0, bfo=isFinalOverdue(b)?1:0; if(afo!==bfo) return bfo-afo; // final atrasado primeiro
-    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0; if(ao!==bo) return bo-ao; // depois atrasados de etapa
+    var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0; var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0; if(aOut!==bOut) return aOut-bOut;
+    var afo=isFinalOverdue(a)?1:0, bfo=isFinalOverdue(b)?1:0; if(afo!==bfo) return bfo-afo;
+    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0; if(ao!==bo) return bo-ao;
     var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return bp-ap;
   });
+
   var overdueFinalCount=cards.filter(function(c){ return isFinalOverdue(c); }).length;
   var overdueStageCount=cards.filter(function(c){ return isOverdue(c); }).length;
-  return { totalValid:totalValid, doneCount:doneCount, overdueFinalCount:overdueFinalCount, overdueStageCount:overdueStageCount, byList:byList, members:members, sorted:sorted };
+  var members=Array.from(cards.reduce(function(m,c){ var k=c.owner||'—'; m.set(k,(m.get(k)||0)+1); return m; }, new Map()).entries()).map(function(e){return {name:e[0],count:e[1]};}).sort(function(a,b){return a.name.localeCompare(b.name);} );
+
+  return { totalValid:totalValid, rawTotal: rawOpen, activeCount:activeCount, doneCount:doneCount,
+    overdueFinalCount:overdueFinalCount, overdueStageCount:overdueStageCount,
+    byList:byList, byOut:byOut, byPre:byPre, byExec:byExec, byCx:byCx,
+    members:members, sorted:sorted };
 }
+
 function renderKpis(m){
   var wrap=$('#kpis');
   if(wrap){
     wrap.innerHTML =
+      '<div class="card"><div class="row"><span class="tag">Cards Total</span></div><div class="kpi"><span class="big" id="kpi-total">–</span><span class="muted" id="kpi-total-pct">–</span></div></div>'+
+      '<div class="card"><div class="row"><span class="tag">Cards Ativos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>'+
       '<div class="card"><div class="row"><span class="tag danger">Atrasados (final)</span></div><div class="kpi"><span class="big" id="kpi-overdue-final">–</span><span class="muted" id="kpi-overdue-final-pct">–</span></div></div>'+
       '<div class="card"><div class="row"><span class="tag danger">Atrasados (Kaban)</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div></div>'+
-      '<div class="card"><div class="row"><span class="tag ok">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>'+
-      '<div class="card"><div class="row"><span class="tag">Cards válidos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>';
+      '<div class="card"><div class="row"><span class="tag ok">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>';
   }
-  $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—';
-  $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
-  $('#kpi-overdue').textContent=m.overdueStageCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—';
-  $('#kpi-overdue-final').textContent=m.overdueFinalCount; $('#kpi-overdue-final-pct').textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—';
+  // Cards Total (válidos / bruto)
+  var kt=$('#kpi-total'); if(kt) kt.textContent=m.totalValid; var ktp=$('#kpi-total-pct'); if(ktp) ktp.textContent=(m && m.rawTotal)? fmtPct(m.totalValid / m.rawTotal) : '—';
+  // Cards Ativos (ativos / válidos)
+  var kv=$('#kpi-valid'); if(kv) kv.textContent=m.activeCount; var kvp=$('#kpi-valid-pct'); if(kvp) kvp.textContent=m.totalValid? fmtPct(m.activeCount/m.totalValid):'—';
+  // Atrasados (Kaban)
+  var ko=$('#kpi-overdue'); if(ko) ko.textContent=m.overdueStageCount; var kop=$('#kpi-overdue-pct'); if(kop) kop.textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—';
+  // Atrasados (final)
+  var kf=$('#kpi-overdue-final'); if(kf) kf.textContent=m.overdueFinalCount; var kfp=$('#kpi-overdue-final-pct'); if(kfp) kfp.textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—';
+  // Finalizados
+  var kd=$('#kpi-done'); if(kd) kd.textContent=m.doneCount; var kdp=$('#kpi-done-pct'); if(kdp) kdp.textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
 }
-function renderKanban(byList, total){ var wrap=$('#kanban'); wrap.innerHTML=''; ORDERED_ACTIVE_KEYS.forEach(function(key,idx){ var qty=byList.get(key)||0; var pct=total? (qty/total):0; var label=ORDERED_ACTIVE_LABELS[idx]; var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem'); el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>'; wrap.appendChild(el); }); }
-function renderMembers(members){ var wrap=$('#members'); wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
+
+function renderKanbanGroup(containerId, labels, map){
+  var wrap=document.getElementById(containerId); if(!wrap) return; wrap.innerHTML='';
+  var total=0; labels.forEach(function(s){ total += (map.get(norm(s))||0); });
+  labels.forEach(function(label){
+    var key=norm(label); var qty=map.get(key)||0; var pct= total? (qty/total):0;
+    var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem');
+    el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>';
+    wrap.appendChild(el);
+  });
+}
+
+function renderMembers(members){ var wrap=$('#members'); if(!wrap){return;} wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
 
 var CURRENT_ROWS=[]; var FULL_ROWS=[]; var sortAsc=false;
 function renderProjects(rows){
-  CURRENT_ROWS=rows.slice(); var tbody=$('#projects tbody'); tbody.innerHTML='';
+  CURRENT_ROWS=rows.slice();
+  var tbody=$('#projects tbody'); if(!tbody) return;
+  tbody.innerHTML='';
   rows.forEach(function(c){
-    var overdueFinal=isFinalOverdue(c); var overdueStage=isOverdue(c);
+    var overdueFinal=isFinalOverdue(c);
+    var overdueStage=isOverdue(c);
     var statusTag = OUT_OF_FLOW_KEYS.has(c.listKey)? '<span class="tag warn">Fora do fluxo</span>' :
                     (DONE_LIST_KEYS.has(c.listKey)? '<span class="tag ok">Finalizado</span>' :
                       (overdueFinal? '<span class="tag danger">Atrasado (final)</span>' : (overdueStage? '<span class="tag danger">Atrasado</span>' : '<span class="tag">Andamento</span>')));
     var prog=(c.progress==null)? '—' : fmtPct(c.progress);
     var linkCell = c.url ? ('<a href="'+c.url+'" target="_blank" rel="noopener noreferrer">Abrir</a>') : '—';
+    var dueHTML = (overdueStage? '<span class="date overdue">'+fmtDate(c.due)+'</span>' : fmtDate(c.due));
+    var finalDueHTML = (overdueFinal? '<span class="date overdue">'+fmtDate(c.finalDue)+'</span>' : fmtDate(c.finalDue));
+    var updatedHTML = (function(){
+      try{
+        var d=c.updatedAt? new Date(c.updatedAt):null;
+        var t=new Date(); t.setHours(0,0,0,0);
+        var stale = (d && Math.floor((t-d)/(1000*60*60*24))>=STALE_DAYS && !DONE_LIST_KEYS.has(c.listKey) && !OUT_OF_FLOW_KEYS.has(c.listKey));
+        return stale? '<span class="date stale">'+fmtDate(c.updatedAt)+'</span>' : fmtDate(c.updatedAt);
+      }catch(_){ return fmtDate(c.updatedAt); }
+    })();
     var tr=document.createElement('tr');
     tr.innerHTML=
       '<td><div style="font-weight:700">'+(c.name||'—')+'</div><div class="muted">'+statusTag+'</div></td>'+
       '<td>'+(c.list||'—')+'</td>'+
       '<td>'+(c.owner||'—')+'</td>'+
-      '<td>'+fmtDate(c.due)+'</td>'+
-      '<td>'+fmtDate(c.finalDue)+'</td>'+
-      '<td>'+tagForPUC(c.puc)+'</td>'+
-      '<td class="right" style="font-weight:700">'+prog+'</td>'+
-      '<td>'+linkCell+'</td>';
+      '<td>'+ dueHTML +'</td>'+
+      '<td>'+ finalDueHTML +'</td>'+
+      '<td>'+ tagForPUC(c.puc) +'</td>'+
+      '<td class="right" style="font-weight:700">'+ prog +'</td>'+
+      '<td>'+ updatedHTML +'</td>'+
+      '<td>'+ linkCell +'</td>';
     tbody.appendChild(tr);
   });
-  $('#totalRows').textContent=rows.length;
+  var trEl=$('#totalRows'); if(trEl) trEl.textContent=rows.length;
 }
-function populateMemberFilter(members){ var sel=$('#memberFilter'); if(!sel) return; var current=sel.value; sel.innerHTML='<option value="">Todos</option>'+members.map(function(m){return '<option value="'+m.name+'">'+m.name+'</option>';}).join(''); if(current && Array.from(sel.options).some(function(o){return o.value===current;})) sel.value=current; }
-function applyTableFilters(){ var rows=FULL_ROWS.slice(); var q=($('#filterInput')&&$('#filterInput').value||'').trim().toLowerCase(); var who=($('#memberFilter')&&$('#memberFilter').value)||''; if(q){ rows=rows.filter(function(r){return (r.name||'').toLowerCase().indexOf(q)>-1;}); } if(who){ rows=rows.filter(function(r){return (r.owner||'')===who;}); } renderProjects(rows); }
+
+function applyTableFilters(){ var rows=FULL_ROWS.slice(); renderProjects(rows); }
 
 // ===== Orquestração =====
 var LAST_RAW=null;
-function loadAndRender(raw){ try{ var ing=ingestTrello(raw); LAST_RAW=raw; var metrics=compute(ing.cards); renderKpis(metrics); renderKanban(metrics.byList, metrics.totalValid); renderMembers(metrics.members);
-  try{ if(typeof updateHeroWithMetrics==='function'){ updateHeroWithMetrics(metrics); } }catch(_){ } FULL_ROWS=metrics.sorted; populateMemberFilter(metrics.members); applyTableFilters(); setMsg('Arquivo carregado com sucesso • '+metrics.totalValid+' cards válidos'); $('#mainContent').scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ console.error(e); setMsg('Erro ao processar: '+(e.message||e)); alert('Não consegui ler este JSON.\n\n'+(e.message||e)); } }
+function loadAndRender(raw){
+  try{
+    var ing=ingestTrello(raw); LAST_RAW=raw;
+    var metrics=compute(ing.cards, ing.rawOpenCount);
+    renderKpis(metrics);
+    renderKanbanGroup('kanban-out', ['Backlog','Suspenso','Cancelado'], metrics.byOut);
+    renderKanbanGroup('kanban-pre', ['A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'], metrics.byPre);
+    renderKanbanGroup('kanban-exec', ['Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'], metrics.byExec);
+    renderKanbanGroup('kanban-cx',  ['Acompanha Resultados'], metrics.byCx);
+    renderMembers(metrics.members);
+    FULL_ROWS=metrics.sorted; applyTableFilters();
+    setMsg('Arquivo carregado com sucesso • '+metrics.activeCount+' cards ativos');
+    $('#mainContent').scrollIntoView({behavior:'smooth', block:'start'});
+  }catch(e){ console.error(e); setMsg('Erro ao processar: '+(e.message||e)); alert('Não consegui ler este JSON.\n\n'+(e.message||e)); }
+}
 
 // ===== UI Handlers =====
-$('#projects thead th[data-sort="progress"]').addEventListener('click', function(){ sortAsc=!sortAsc; var sorted=CURRENT_ROWS.slice().sort(function(a,b){ var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return sortAsc? (ap-bp):(bp-ap); }); renderProjects(sorted); });
+(function(){ var _hdr=$('#projects thead th[data-sort="progress"]'); if(!_hdr){ logd('SORT: cabeçalho não encontrado (progress)'); return; } _hdr.addEventListener('click', function(){ sortAsc=!sortAsc; var sorted=CURRENT_ROWS.slice().sort(function(a,b){ var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return sortAsc? (ap-bp):(bp-ap); }); renderProjects(sorted); }); })();
 
 var fileInput=$('#fileInput'); var fileLabel=$('#fileLabel');
-fileInput.addEventListener('change', function(ev){ var f=ev.target.files && ev.target.files[0]; if(!f){return;}  try{ var reader=new FileReader(); reader.onload=function(){ try{ var txt=String(reader.result||''); var clean=txt.replace(/^\uFEFF/, ''); var json=JSON.parse(clean); loadAndRender(json);}catch(e){ console.error(e); setMsg('Erro ao ler arquivo: '+(e.message||e)); alert('Arquivo inválido.\n\n'+(e.message||e)); } }; reader.onerror=function(){ setMsg('Falha ao ler arquivo: '+(reader.error||''));}; reader.readAsText(f); }catch(e){ setMsg('Erro ao preparar leitura: '+(e.message||e)); } });
-
-var _bDemo=$('#btnDemo'); if(_bDemo) _bDemo.addEventListener('click', function(){ var demo={ lists:[{id:'l1',name:'Dev'},{id:'l2',name:'Concluído'},{id:'l3',name:'Backlog'},{id:'l4',name:'Acompanha Resultados'}], members:[{id:'m1',fullName:'ricardo.michelin'},{id:'m2',fullName:'Beatriz Cristina Causs Barbieri'}], checklists:[{idCard:'c1',checkItems:[{state:'complete'},{state:'complete'},{state:'incomplete'}]},{idCard:'c2',checkItems:[{state:'complete'},{state:'complete'}]}], cards:[ {id:'c1',idList:'l1',name:'Integração API X',due:'2025-09-20',idMembers:['m1'],labels:[{name:'Urgente'}]}, {id:'c2',idList:'l2',name:'Entrega Módulo Y',due:'2025-08-30',idMembers:['m2'],labels:[{name:'Prioridade'}]}, {id:'c3',idList:'l3',name:'Backlog',due:null,idMembers:['m2'],labels:[]}, {id:'c4',idList:'l4',name:'Estudo Z',due:null,idMembers:[],labels:[{name:'Crítico'}]} ] }; loadAndRender(demo); setMsg('Demo carregada • '+demo.cards.length+' cards'); });
-
-var _bReset=$('#btnReset'); if(_bReset) _bReset.addEventListener('click', function(){ LAST_RAW=null; $('#kpi-valid').textContent='–'; $('#kpi-valid-pct').textContent='–'; $('#kpi-done').textContent='–'; $('#kpi-done-pct').textContent='–'; $('#members').innerHTML=''; $('#kanban').innerHTML=''; $('#projects tbody').innerHTML=''; $('#totalRows').textContent='0'; fileInput.value=''; fileLabel.textContent='Selecionar JSON do Trello'; setMsg('Pronto para carregar um JSON do Trello…'); });
-
-var _bFetch=$('#btnFetchLocal'); if(_bFetch) _bFetch.addEventListener('click', function(){ (function(){ try{ if(location.protocol==='file:'){ setMsg('Aviso: aberto via file://. Alguns navegadores bloqueiam leitura local. Prefira http (ex.: GitHub Pages) ou use Selecionar JSON.'); } fetch('./projetos.json?nocache='+(Date.now()),{cache:'no-cache'}).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }).then(function(j){ loadAndRender(j); setMsg('Arquivo carregado: ./projetos.json'); }).catch(function(e){ console.error(e); setMsg('Falha ao carregar ./projetos.json: '+(e.message||e)); alert('Não foi possível ler ./projetos.json.'); }); }catch(e){ setMsg('Falha geral ao buscar ./projetos.json: '+(e.message||e)); } })(); });
+fileInput.addEventListener('change', function(ev){ var f=ev.target.files && ev.target.files[0]; if(!f){return;}  try{ setMsg('Lendo arquivo: '+f.name+'…'); var reader=new FileReader(); reader.onload=function(){ try{ var txt=String(reader.result||''); var clean=txt.replace(/^\uFEFF/, ''); clean = clean.replace(/^\ufeff/, ''); var json=JSON.parse(clean); loadAndRender(json);}catch(e){ console.error(e); setMsg('Erro ao ler arquivo: '+(e.message||e)); alert('Arquivo inválido.\n\n'+(e.message||e)); } }; reader.onerror=function(){ setMsg('Falha ao ler arquivo: '+(reader.error||''));}; reader.readAsText(f); }catch(e){ setMsg('Erro ao preparar leitura: '+(e.message||e)); } });
 
 // Erros globais
 window.addEventListener('error', function(e){ setMsg('Erro de script: '+(e && e.message? e.message : 'desconhecido')); });
 window.addEventListener('unhandledrejection', function(e){ var m=(e && e.reason && (e.reason.message||e.reason))||'desconhecido'; setMsg('Erro assíncrono: '+m); });
-function updateHeroWithMetrics(m){ try{ var listsCount=0; if(m && m.byList){ m.byList.forEach(function(v){ if(v>0) listsCount++; }); } var hc=document.getElementById('hero-cards'); if(hc) hc.textContent = (m && typeof m.totalValid==='number')? m.totalValid : '–'; var hm=document.getElementById('hero-members'); if(hm) hm.textContent = (m && m.members)? m.members.length : '–'; var hl=document.getElementById('hero-lists'); if(hl) hl.textContent = listsCount || '–'; }catch(_){}}
+
+// Self-tests mínimos
+(function selfTests(){ try{ if(!document.getElementById('kpis')) logd('TEST FAIL: #kpis inexistente'); else logd('TEST OK: #kpis'); if(!document.getElementById('members')) logd('TEST FAIL: #members inexistente'); else logd('TEST OK: #members'); renderKpis({activeCount:0,totalValid:0,doneCount:0,overdueStageCount:0,overdueFinalCount:0, rawTotal:0}); logd('TEST OK: renderKpis executou'); var mini={lists:[{id:'L1',name:'Dev'}], members:[{id:'M1',fullName:'Teste User'}], checklists:[], cards:[{id:'C1',idList:'L1',name:'Card X',closed:false,idMembers:['M1'],labels:[],dateLastActivity:'2025-08-01T00:00:00Z'}]}; var ing=ingestTrello(mini); if(!ing || !Array.isArray(ing.cards) || ing.cards.length!==1){ logd('TEST FAIL: ingestTrello mini'); } else { logd('TEST OK: ingestTrello mini'); } }catch(err){ logd('TEST FAIL:', err.message||err); }})();
 </script>
 </body>
 </html>
