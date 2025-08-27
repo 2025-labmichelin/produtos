@@ -31,6 +31,10 @@
     body{margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; line-height:1.5}
     :focus-visible{outline:2px solid var(--focus); outline-offset:3px; border-radius:8px}
 
+    /* Barra superior verde com degradê */
+    .brandbar{height:8px;background:linear-gradient(90deg,#00A443 0%, #38D986 100%);} 
+    @media (prefers-reduced-motion: reduce){.brandbar{background:#00A443}}
+
     header{padding:20px; border-bottom:1px solid var(--stroke); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--card)}
     .brand{display:flex; align-items:center; gap:10px}
     .brand h1{font-size:18px; margin:0}
@@ -92,17 +96,22 @@
     .date.overdue{color:var(--danger);font-weight:700}
     .date.stale{color:var(--warn);font-weight:700}
 
-  /* === Ajustes de layout dos KPIs (disposição e tamanho) === */
-#kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px}
-#kpis .card{padding:12px; border-radius:12px; min-height:116px}
-#kpis .row{margin-bottom:4px}
-#kpis .kpi{margin-top:8px; padding-top:8px}
-#kpis .kpi .big{font-size:32px}
-#kpis .kpi .muted{font-size:13px}
+    /* Ajustes de layout dos KPIs */
+    #kpis{grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px}
+    #kpis .card{padding:12px; border-radius:12px; min-height:116px}
+    #kpis .row{margin-bottom:4px}
+    #kpis .kpi{margin-top:8px; padding-top:8px}
+    #kpis .kpi .big{font-size:32px}
+    #kpis .kpi .muted{font-size:13px}
+  /* Hero topo com degradê azul→verde */
+.hero { margin: 16px 0 12px; padding: 22px 20px; border-radius: 14px; color: #fff; background: linear-gradient(90deg, #0E4970 0%, #139a73 100%); box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.hero h1 { margin: 0; font-size: 20px; font-weight: 800; }
+@media (max-width: 640px){ .hero { padding: 18px 16px; } .hero h1 { font-size: 18px; } }
 
 </style>
 </head>
 <body>
+  <div class="brandbar" aria-hidden="true"></div>
   <header>
     <div class="brand"></div>
     <div class="actions" role="group" aria-label="Carregar dados">
@@ -113,6 +122,9 @@
       <span id="hdrStatus" class="status-pill">Pronto</span>
     </div>
   </header>
+  <div class="hero" aria-label="Apresentação do dashboard">
+    <h1>Visão Geral dos Projetos</h1>
+  </div>
 
   <div id="msg" style="padding:10px 20px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--stroke);font-size:12px">Pronto para carregar um JSON do Trello…</div>
   <details id="dbg" style="margin:8px 22px"><summary style="cursor:pointer">Diagnóstico</summary>
@@ -207,7 +219,7 @@ function isOverdue(c){ try{ if(!c||!c.due) return false; if(DONE_LIST_KEYS.has(c
 function isFinalOverdue(c){ try{ if(!c || !c.finalDue) return false; if (DONE_LIST_KEYS.has(c.listKey) || OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d = new Date(c.finalDue); if (isNaN(d)) return false; var today = new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
 
 // ===== Config =====
-var STALE_DAYS = 10; // 'Sem atualização' quando última atualização for há >= 10 dias
+var STALE_DAYS = 10; // 'Sem atualização (stale)' quando última atualização for há >= 10 dias
 var ORDERED_ACTIVE_LABELS=[
   'Nova Demanda',
   'Estudo Téc/RN',
@@ -297,7 +309,7 @@ function ingestTrello(raw){
         var list=listsById.get(c.idList);
         var rawListName = list? list.name : (c.listName||'');
         rawListName = String(rawListName||'').trim();
-        // normaliza sinônimos de listas para os rótulos canônicos do Kanban
+        // normaliza sinônimos de listas
         (function(){
           var pairs = [
             ['Levantamento do Esforço','Levantamento de Esforço'],
@@ -354,7 +366,7 @@ function compute(cards, rawOpen){
   var totalValid=cards.length;
   var doneCount=cards.filter(function(c){return DONE_LIST_KEYS.has(c.listKey);}).length;
 
-  // Kanban ativo (14 listas)
+  // Kanban ativo (15 listas)
   var byList=new Map(ORDERED_ACTIVE_LABELS.map(function(s){return [norm(s),0];}));
   cards.forEach(function(c){ if(byList.has(c.listKey)){ byList.set(c.listKey,(byList.get(c.listKey)||0)+1); } });
   var activeCount = 0; byList.forEach(function(v){ activeCount += v||0; });
