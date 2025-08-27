@@ -209,9 +209,21 @@ function isFinalOverdue(c){ try{ if(!c || !c.finalDue) return false; if (DONE_LI
 // ===== Config =====
 var STALE_DAYS = 10; // 'Sem atualização' quando última atualização for há >= 10 dias
 var ORDERED_ACTIVE_LABELS=[
-  'A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço',
-  'Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)',
-  'Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'
+  'Nova Demanda',
+  'Estudo Téc/RN',
+  'Levantamento de Esforço',
+  'Aprovação de Esforço',
+  'Planejamento',
+  'Cronograma',
+  'Debito Técnico',
+  'Construção da EF',
+  'Confirmação da EF (WTéc)',
+  'Validação EF',
+  'Pronto para DEV',
+  'Dev',
+  'QA Wittel',
+  'Certificação',
+  'Deploy'
 ];
 var ORDERED_ACTIVE_KEYS=ORDERED_ACTIVE_LABELS.map(norm);
 var OUT_OF_FLOW_KEYS=new Set(['Backlog','Suspenso','Cancelado'].map(norm));
@@ -294,7 +306,8 @@ function ingestTrello(raw){
             ['Confirmacao da EF (WTec)','Confirmação da EF (WTéc)'],
             ['Confirmação EF (WTec)','Confirmação da EF (WTéc)'],
             ['Validacao EF','Validação EF'],
-            ['A fazer','A Fazer']
+            ['A fazer','Nova Demanda'],
+            ['A Fazer','Nova Demanda']
           ];
           var k = norm(rawListName);
           for (var i=0;i<pairs.length;i++){ if (norm(pairs[i][0])===k) { rawListName = pairs[i][1]; break; } }
@@ -334,8 +347,8 @@ function ingestTrello(raw){
 function compute(cards, rawOpen){
   // Grupos
   var GROUP_OUT_LABELS = ['Backlog','Suspenso','Cancelado'];
-  var GROUP_PRE_LABELS = ['A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'];
-  var GROUP_EXEC_LABELS = ['Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'];
+  var GROUP_PRE_LABELS = ['Nova Demanda','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'];
+  var GROUP_EXEC_LABELS = ['Planejamento','Cronograma','Debito Técnico','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'];
   var GROUP_CX_LABELS  = ['Acompanha Resultados'];
 
   var totalValid=cards.length;
@@ -453,8 +466,8 @@ function loadAndRender(raw){
     var metrics=compute(ing.cards, ing.rawOpenCount);
     renderKpis(metrics);
     renderKanbanGroup('kanban-out', ['Backlog','Suspenso','Cancelado'], metrics.byOut);
-    renderKanbanGroup('kanban-pre', ['A Fazer','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'], metrics.byPre);
-    renderKanbanGroup('kanban-exec', ['Debito Técnico','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'], metrics.byExec);
+    renderKanbanGroup('kanban-pre', ['Nova Demanda','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'], metrics.byPre);
+    renderKanbanGroup('kanban-exec', ['Planejamento','Cronograma','Debito Técnico','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Deploy'], metrics.byExec);
     renderKanbanGroup('kanban-cx',  ['Acompanha Resultados'], metrics.byCx);
     renderMembers(metrics.members);
     FULL_ROWS=metrics.sorted; applyTableFilters();
