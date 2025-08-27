@@ -6,26 +6,42 @@
   <title>Dashboard – Neoenergia × Wittel</title>
   <style>
     :root{
-      --bg:#0b0c0e; --card:#121418; --muted:#98a2b3; --text:#e6e7e9;
-      --accent:#22c55e; --accent-2:#60a5fa; --warn:#f59e0b; --danger:#ef4444; --ok:#10b981;
-      --chip:#1b1f27; --stroke:#1f2430; --focus:#c084fc;
+      /* Light theme */
+      --bg:#F7F9FC;           /* página */
+      --card:#FFFFFF;         /* cards/tabelas */
+      --surface-2:#F1F5F9;    /* superfícies internas */
+      --stroke:#E5E7EB;       /* bordas */
+      --text:#0F172A;         /* texto principal */
+      --muted:#475569;        /* texto secundário */
+
+      /* Semânticas (Neoenergia) */
+      --ok:#00A443;           /* Concluído */
+      --warn:#F68C1B;         /* Fora do fluxo / Urgente */
+      --danger:#EF4444;       /* Atrasos / Crítico */
+      --primary:#2CB6FF;      /* Prioridade / CTAs */
+
+      /* Legados/auxiliares */
+      --accent:#2CB6FF;       /* gradientes leves */
+      --accent-2:#2CB6FF;     /* botão principal */
+      --chip:#F1F5F9;
+      --focus:#7C3AED;        /* foco acessível */
     }
     *{box-sizing:border-box}
     html,body{height:100%}
     body{margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; line-height:1.5}
     :focus-visible{outline:2px solid var(--focus); outline-offset:3px; border-radius:8px}
 
-    header{padding:20px; border-bottom:1px solid var(--stroke); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    header{padding:20px; border-bottom:1px solid var(--stroke); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--card)}
     .brand{display:flex; align-items:center; gap:10px}
     .brand h1{font-size:18px; margin:0}
     .actions{display:flex; gap:8px; flex-wrap:wrap}
 
-    .btn{background:var(--accent-2); color:#0b1220; border:none; padding:10px 14px; border-radius:10px; font-weight:600; cursor:pointer}
-    .btn.secondary{background:#0e1725; color:var(--text); border:1px solid var(--stroke)}
+    .btn{background:var(--primary); color:#fff; border:none; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer}
+    .btn.secondary{background:var(--card); color:var(--text); border:1px solid var(--stroke)}
 
     .file-wrap{position:relative}
     input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
-    .file-label{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; background:var(--accent-2); color:#0b1220; border:none; font-weight:700; cursor:pointer}
+    .file-label{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; background:var(--primary); color:#fff; border:none; font-weight:700; cursor:pointer}
 
     main{padding:22px; max-width:1400px; margin:0 auto}
     .grid{display:grid; gap:16px}
@@ -43,38 +59,48 @@
     .kanban-list{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px}
     @media (max-width:1100px){.kanban-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:680px){.kanban-list{grid-template-columns:1fr}}
-    .tile{background:#0e1116; border:1px solid var(--stroke); border-radius:14px; padding:12px}
+    .tile{background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:12px}
     .tile .name{font-weight:700; margin:0 0 6px}
     .tile .bar{height:8px; background:#1c2330; border-radius:999px; overflow:hidden}
     .tile .fill{height:8px; background:linear-gradient(90deg, var(--accent-2), #8b5cf6)}
     .tile .foot{display:flex; justify-content:space-between; margin-top:6px; color:var(--muted); font-size:12px}
 
     .bars{display:flex; flex-direction:column; gap:10px; margin-top:6px}
-    .bar-outer{height:12px; background:#10151e; border:1px solid var(--stroke); border-radius:999px; overflow:hidden}
-    .bar-inner{height:12px; background:linear-gradient(90deg, var(--accent), #4ade80)}
+    .bar-outer{height:12px; background:var(--surface-2); border:1px solid var(--stroke); border-radius:999px; overflow:hidden}
+    .bar-inner{height:12px; background:linear-gradient(90deg, var(--primary), #7C3AED)}
 
     table{width:100%; border-collapse:collapse; margin-top:8px; font-size:14px}
     th, td{padding:10px 8px; border-bottom:1px solid var(--stroke); vertical-align:top}
     th{color:var(--muted); font-weight:600; text-align:left}
     tr:last-child td{border-bottom:none}
-    .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
-    .tag.ok{background:rgba(16,185,129,.1); color:#22c55e; border-color:rgba(16,185,129,.2)}
-    .tag.warn{background:rgba(245,158,11,.1); color:#f59e0b; border-color:rgba(245,158,11,.2)}
-    .tag.danger{background:rgba(239,68,68,.12); color:#ef4444; border-color:rgba(239,68,68,.3)}
+    .tag{display:inline-flex; align-items:center; gap:6px; padding:3px 8px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted)}
+    .tag.ok{background:rgba(0,164,67,.12); color:var(--ok); border-color:rgba(0,164,67,.3)}
+    .tag.warn{background:rgba(246,140,27,.15); color:var(--warn); border-color:rgba(246,140,27,.35)}
+    .tag.danger{background:rgba(239,68,68,.15); color:var(--danger); border-color:rgba(239,68,68,.35)}
+    .tag.info{background:rgba(44,182,255,.12); color:var(--primary); border-color:rgba(44,182,255,.3)}
     .hidden{display:none}
 
     .badge{display:inline-flex; align-items:center; gap:6px; padding:2px 6px; border-radius:999px; font-size:11px; background:#0f1722; border:1px solid var(--stroke); color:var(--muted)}
     .badge.new{background:rgba(96,165,250,.12); color:#93c5fd; border-color:rgba(96,165,250,.3)}
     .overcap{color:#fca5a5}
-  .status-pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; background:#0e1725; border:1px solid var(--stroke); color:var(--muted)}
-  </style>
+  .status-pill{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted)}
+  .date.overdue{color:var(--danger);font-weight:700}
+#projects.table-sticky thead th{position:sticky;top:0;background:var(--card);z-index:2;box-shadow:0 2px 0 0 var(--stroke)}
+#projects tbody tr:nth-child(odd){background:rgba(0,0,0,.02)}
+#projects tbody tr:hover{background:rgba(0,0,0,.04)}
+  .hero{position:relative; border-radius:16px; padding:24px; color:#fff; background:linear-gradient(90deg,#0B5FA8 0%, #1DA1A9 55%, #33C17C 100%);} 
+.hero::before{content:""; position:absolute; inset:0; border-radius:inherit; background:linear-gradient(0deg, rgba(0,0,0,.16), rgba(0,0,0,.16));}
+.hero .content{position:relative; display:flex; gap:16px; align-items:flex-start; justify-content:space-between}
+.hero h2{margin:0 0 6px; font-size:20px; font-weight:800; letter-spacing:-.2px}
+.hero p{margin:0; font-size:14px; opacity:.95; max-width:56ch}
+.kpi-hero{display:flex; gap:24px; align-items:center}
+.kpi-hero .num{font-size:32px; font-weight:800; line-height:1}
+.kpi-hero .label{font-size:12px; opacity:.92; letter-spacing:.2px}
+</style>
 </head>
 <body>
   <header>
-    <div class="brand">
-      <span class="tag">Neoenergia × Wittel</span>
-      <h1>Dashboard</h1>
-    </div>
+    <div class="brand"></div>
     <div class="actions" role="group" aria-label="Carregar dados">
       <div class="file-wrap">
         <span id="fileLabel" class="file-label" aria-live="polite">Carregar JSON</span>
@@ -84,12 +110,20 @@
     </div>
   </header>
 
-  <div id="msg" style="padding:10px 20px;color:#e6e7e9;background:#0e1116;border-bottom:1px solid var(--stroke);font-size:12px">Pronto para carregar um JSON do Trello…</div>
+  <div id="msg" style="padding:10px 20px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--stroke);font-size:12px">Pronto para carregar um JSON do Trello…</div>
   <details id="dbg" style="margin:8px 22px"><summary style="cursor:pointer">Diagnóstico</summary>
     <pre id="dbgLog" style="white-space:pre-wrap; font-size:12px; color:var(--muted); background:#0e1116; border:1px solid var(--stroke); border-radius:10px; padding:10px; max-height:200px; overflow:auto"></pre>
   </details>
 
   <main id="mainContent" class="grid cols-2">
+    <section id="heroBanner" class="hero" style="grid-column:1 / -1">
+      <div class="content">
+        <div>
+          <h2>Visão Geral dos Projetos</h2>
+          <p>Acompanhe o progresso, identifique gargalos e otimize o desempenho da equipe</p>
+        </div>
+      </div>
+    </section>
     <section class="card" aria-labelledby="resumo-h2">
       <h2 id="resumo-h2">Resumo</h2>
       <div id="kpis" class="grid cols-2">
@@ -119,12 +153,17 @@
       <div class="row" style="justify-content:flex-end; align-items:center">
         <div class="muted">Total: <span id="totalRows">0</span></div>
       </div>
-      <table id="projects">
+      <table id="projects" class="table-sticky">
         <thead>
           <tr>
-            <th>Projeto</th><th>Lista</th><th>Responsável</th><th>Entrega</th><th>Entrega Final</th><th>PUC</th>
-            <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar por progresso">Progresso ▲▼</th>
-            <th>Card</th>
+            <th data-sort="name">Projeto</th>
+            <th data-sort="list">Lista</th>
+            <th data-sort="owner">Responsável</th>
+            <th data-sort="due">Entrega</th>
+            <th data-sort="finalDue">Entrega Final</th>
+            <th data-sort="puc">PUC</th>
+            <th class="right" data-sort="progress" style="cursor:pointer" title="Ordenar">Progresso ▲▼</th>
+            <th data-sort="url">Card</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -155,7 +194,13 @@ function titleCaseLike(str){if(!str) return ''; var low=['de','da','do','dos','d
 function normalizeMember(raw){if(!raw) return '—'; var key=String(raw).trim(); return MEMBER_MAP.get(key)||titleCaseLike(key);} 
 function fmtPct(n){if(isNaN(n)||n==null) return '—'; var v=Math.round(n*1000)/10; return (v.toFixed(1).replace('.0',''))+'%';}
 function fmtDate(s){if(!s) return '—'; var d=new Date(s); if(isNaN(d)) return '—'; var dd=String(d.getDate()).padStart(2,'0'); var mm=String(d.getMonth()+1).padStart(2,'0'); var yyyy=d.getFullYear(); return dd+'/'+mm+'/'+yyyy;}
-function tagForPUC(puc){var v=String(puc||'').toLowerCase(); if(v==='crítico'||v==='critico') return '<span class="tag warn">Crítico</span>'; if(v==='urgente') return '<span class="tag warn">Urgente</span>'; if(v==='prioridade') return '<span class="tag ok">Prioridade</span>'; return '<span class="tag">—</span>';}
+function tagForPUC(puc){
+  var v=String(puc||'').toLowerCase();
+  if(v==='crítico'||v==='critico') return '<span class="tag danger">Crítico</span>';
+  if(v==='urgente') return '<span class="tag warn">Urgente</span>';
+  if(v==='prioridade') return '<span class="tag info">Prioridade</span>';
+  return '<span class="tag">—</span>';
+}
 // Regra: atrasado = tem due no passado e não está finalizado nem fora do fluxo
 function isOverdue(c){ try{ if(!c||!c.due) return false; if(DONE_LIST_KEYS.has(c.listKey)||OUT_OF_FLOW_KEYS.has(c.listKey)) return false; var d=new Date(c.due); if(isNaN(d)) return false; var today=new Date(); today.setHours(0,0,0,0); return d < today; }catch(_){ return false; } }
 // Regra: atrasado (final) = possui finalDue no passado e não está finalizado
@@ -273,16 +318,18 @@ function compute(cards){
   return { totalValid:totalValid, doneCount:doneCount, overdueFinalCount:overdueFinalCount, overdueStageCount:overdueStageCount, byList:byList, members:members, sorted:sorted };
 }
 function renderKpis(m){
+  var wrap=$('#kpis');
+  if(wrap){
+    wrap.innerHTML =
+      '<div class="card"><div class="row"><span class="tag danger">Atrasados (final)</span></div><div class="kpi"><span class="big" id="kpi-overdue-final">–</span><span class="muted" id="kpi-overdue-final-pct">–</span></div></div>'+
+      '<div class="card"><div class="row"><span class="tag danger">Atrasados (Kaban)</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div></div>'+
+      '<div class="card"><div class="row"><span class="tag ok">Finalizados</span></div><div class="kpi"><span class="big" id="kpi-done">–</span><span class="muted" id="kpi-done-pct">–</span></div></div>'+
+      '<div class="card"><div class="row"><span class="tag">Cards válidos</span></div><div class="kpi"><span class="big" id="kpi-valid">–</span><span class="muted" id="kpi-valid-pct">–</span></div></div>';
+  }
   $('#kpi-valid').textContent=m.totalValid; $('#kpi-valid-pct').textContent=m.totalValid? fmtPct(1):'—';
   $('#kpi-done').textContent=m.doneCount; $('#kpi-done-pct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
-  // KPI Atrasados (Kaban)
-  var ocS=$('#kpi-overdue');
-  if(!ocS){ var wrapS=$('#kpis'); if(wrapS){ var cardS=document.createElement('div'); cardS.className='card'; cardS.innerHTML='<div class="row"><span class="tag danger">Atrasados (Kaban)</span></div><div class="kpi"><span class="big" id="kpi-overdue">–</span><span class="muted" id="kpi-overdue-pct">–</span></div>'; wrapS.appendChild(cardS); ocS=$('#kpi-overdue'); } }
-  if(ocS){ $('#kpi-overdue').textContent=m.overdueStageCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—'; }
-  // KPI Atrasados (final)
-  var ocF=$('#kpi-overdue-final');
-  if(!ocF){ var wrapF=$('#kpis'); if(wrapF){ var cardF=document.createElement('div'); cardF.className='card'; cardF.innerHTML='<div class="row"><span class="tag danger">Atrasados (final)</span></div><div class="kpi"><span class="big" id="kpi-overdue-final">–</span><span class="muted" id="kpi-overdue-final-pct">–</span></div>'; wrapF.appendChild(cardF); ocF=$('#kpi-overdue-final'); } }
-  if(ocF){ $('#kpi-overdue-final').textContent=m.overdueFinalCount; $('#kpi-overdue-final-pct').textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—'; }
+  $('#kpi-overdue').textContent=m.overdueStageCount; $('#kpi-overdue-pct').textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—';
+  $('#kpi-overdue-final').textContent=m.overdueFinalCount; $('#kpi-overdue-final-pct').textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—';
 }
 function renderKanban(byList, total){ var wrap=$('#kanban'); wrap.innerHTML=''; ORDERED_ACTIVE_KEYS.forEach(function(key,idx){ var qty=byList.get(key)||0; var pct=total? (qty/total):0; var label=ORDERED_ACTIVE_LABELS[idx]; var el=document.createElement('div'); el.className='tile'; el.setAttribute('role','listitem'); el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>'; wrap.appendChild(el); }); }
 function renderMembers(members){ var wrap=$('#members'); wrap.innerHTML=''; if(!members.length){ wrap.innerHTML='<div class="muted">Sem responsáveis informados.</div>'; return;} var universe=members.reduce(function(s,m){return s+m.count;},0); members.forEach(function(m){ var pct=universe? (m.count/universe):0; var cap=CONFIG.capacity? CONFIG.capacity[m.name] : undefined; var over=(typeof cap==='number') && (m.count>cap); var badge=''; var el=document.createElement('div'); el.innerHTML='<div class="row" style="justify-content:space-between"><div>'+m.name+' '+badge+'</div><div class="muted '+(over?'overcap':'')+'">'+m.count+(typeof cap==='number'? (' / cap '+cap):'')+' • '+fmtPct(pct)+'</div></div><div class="bar-outer" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+Math.round(pct*100)+'" aria-label="'+m.name+'"><div class="bar-inner" style="width:'+Math.round(pct*100)+'%"></div></div>'; wrap.appendChild(el); }); }
@@ -316,7 +363,8 @@ function applyTableFilters(){ var rows=FULL_ROWS.slice(); var q=($('#filterInput
 
 // ===== Orquestração =====
 var LAST_RAW=null;
-function loadAndRender(raw){ try{ var ing=ingestTrello(raw); LAST_RAW=raw; var metrics=compute(ing.cards); renderKpis(metrics); renderKanban(metrics.byList, metrics.totalValid); renderMembers(metrics.members); FULL_ROWS=metrics.sorted; populateMemberFilter(metrics.members); applyTableFilters(); setMsg('Arquivo carregado com sucesso • '+metrics.totalValid+' cards válidos'); $('#mainContent').scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ console.error(e); setMsg('Erro ao processar: '+(e.message||e)); alert('Não consegui ler este JSON.\n\n'+(e.message||e)); } }
+function loadAndRender(raw){ try{ var ing=ingestTrello(raw); LAST_RAW=raw; var metrics=compute(ing.cards); renderKpis(metrics); renderKanban(metrics.byList, metrics.totalValid); renderMembers(metrics.members);
+  try{ if(typeof updateHeroWithMetrics==='function'){ updateHeroWithMetrics(metrics); } }catch(_){ } FULL_ROWS=metrics.sorted; populateMemberFilter(metrics.members); applyTableFilters(); setMsg('Arquivo carregado com sucesso • '+metrics.totalValid+' cards válidos'); $('#mainContent').scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ console.error(e); setMsg('Erro ao processar: '+(e.message||e)); alert('Não consegui ler este JSON.\n\n'+(e.message||e)); } }
 
 // ===== UI Handlers =====
 $('#projects thead th[data-sort="progress"]').addEventListener('click', function(){ sortAsc=!sortAsc; var sorted=CURRENT_ROWS.slice().sort(function(a,b){ var ap=(a.progress==null? -1:a.progress); var bp=(b.progress==null? -1:b.progress); return sortAsc? (ap-bp):(bp-ap); }); renderProjects(sorted); });
@@ -333,6 +381,7 @@ var _bFetch=$('#btnFetchLocal'); if(_bFetch) _bFetch.addEventListener('click', f
 // Erros globais
 window.addEventListener('error', function(e){ setMsg('Erro de script: '+(e && e.message? e.message : 'desconhecido')); });
 window.addEventListener('unhandledrejection', function(e){ var m=(e && e.reason && (e.reason.message||e.reason))||'desconhecido'; setMsg('Erro assíncrono: '+m); });
+function updateHeroWithMetrics(m){ try{ var listsCount=0; if(m && m.byList){ m.byList.forEach(function(v){ if(v>0) listsCount++; }); } var hc=document.getElementById('hero-cards'); if(hc) hc.textContent = (m && typeof m.totalValid==='number')? m.totalValid : '–'; var hm=document.getElementById('hero-members'); if(hm) hm.textContent = (m && m.members)? m.members.length : '–'; var hl=document.getElementById('hero-lists'); if(hl) hl.textContent = listsCount || '–'; }catch(_){}}
 </script>
 </body>
 </html>
