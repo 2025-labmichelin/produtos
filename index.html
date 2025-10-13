@@ -1,0 +1,1711 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Executivo — Neoenergia × Wittel</title>
+  <style>
+    :root{
+      /* Light theme */
+      --bg:#F7F9FC;
+      --card:#FFFFFF;
+      --surface-2:#F1F5F9;
+      --stroke:#E5E7EB;
+      --text:#0F172A;
+      --muted:#475569;
+
+      /* Semânticas */
+      --ok:#00A443;
+      --warn:#F68C1B;
+      --danger:#EF4444;
+      --primary:#2CB6FF;
+
+      /* Banco de Horas */
+      --bh-consumed:#2CB6FF;
+      --bh-available:#00A443;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background:var(--bg); color:var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial; line-height:1.6}
+    :focus-visible{outline:2px solid #7C3AED; outline-offset:3px; border-radius:8px}
+
+    /* Barra superior verde */
+    .brandbar{height:8px;background:linear-gradient(90deg,#00A443 0%, #38D986 100%);}
+
+    /* Header */
+    header{padding:20px 24px; border-bottom:1px solid var(--stroke); display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; background:var(--card)}
+    .brand{display:flex; align-items:center; gap:10px}
+    .brand h1{font-size:18px; margin:0; font-weight:700}
+    .actions{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+
+    /* Botão Carregar JSON */
+    .btn{background:var(--primary); color:#fff; border:none; padding:12px 18px; border-radius:10px; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s ease; box-shadow:0 2px 4px rgba(44,182,255,0.2)}
+    .btn:hover{background:#1da1e6; box-shadow:0 4px 8px rgba(44,182,255,0.3); transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+
+    /* File input */
+    .file-wrap{position:relative}
+    input[type=file]{position:absolute; inset:0; opacity:0; cursor:pointer}
+    .file-label{display:inline-flex; align-items:center; gap:8px; padding:12px 18px; border-radius:10px; background:var(--primary); color:#fff; border:none; font-weight:700; cursor:pointer; font-size:14px; transition:all 0.2s ease; box-shadow:0 2px 4px rgba(44,182,255,0.2)}
+    .file-label:hover{background:#1da1e6; box-shadow:0 4px 8px rgba(44,182,255,0.3); transform:translateY(-1px)}
+
+    /* Status pill */
+    .status-pill{display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted); font-weight:500}
+    .status-pill.success{background:rgba(0,164,67,.12); color:var(--ok); border-color:rgba(0,164,67,.3)}
+    .status-pill.error{background:rgba(239,68,68,.15); color:var(--danger); border-color:rgba(239,68,68,.35)}
+
+    /* Main */
+    main{padding:24px; max-width:1400px; margin:0 auto}
+    .grid{display:grid; gap:20px}
+
+    /* Hero */
+    .hero{margin:0 0 24px; padding:24px; border-radius:16px; color:#fff; background:linear-gradient(90deg, #0E4970 0%, #139a73 100%); box-shadow:0 2px 12px rgba(0,0,0,.08)}
+    .hero h1{margin:0; font-size:24px; font-weight:800}
+
+    /* Card base */
+    .card{background:var(--card); border:1px solid var(--stroke); border-radius:16px; padding:22px; box-shadow:0 2px 8px rgba(0,0,0,0.06); transition:box-shadow 0.2s ease}
+    .card h2{margin:0 0 16px; font-size:18px; font-weight:700}
+
+    /* PAINEL BANCO DE HORAS */
+    .banco-horas-panel{grid-column:1 / -1; padding:24px}
+    .banco-horas-content{display:flex; gap:32px; align-items:center; flex-wrap:wrap}
+    
+    /* Gráfico Donut */
+    .donut-chart{position:relative; width:180px; height:180px; flex-shrink:0}
+    .donut-chart svg{width:100%; height:100%; transform:rotate(-90deg)}
+    .donut-text{position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center}
+    .donut-text .percentage{font-size:32px; font-weight:800; color:var(--text); line-height:1; display:block}
+    .donut-text .label{font-size:13px; color:var(--muted); margin-top:4px; display:block}
+
+    /* Cards de info */
+    .bh-cards{display:flex; gap:16px; flex:1; min-width:0}
+    .bh-card{background:var(--card); border:1px solid var(--stroke); border-radius:12px; padding:16px; text-align:center; flex:1; min-width:140px}
+    .bh-card .label{font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px}
+    .bh-card .value{font-size:20px; font-weight:700; color:var(--text); line-height:1.2}
+    .bh-card .value.blue{color:var(--bh-consumed)}
+    .bh-card .value.green{color:var(--bh-available)}
+    .bh-card .value.small{font-size:14px}
+
+    /* Responsivo Banco de Horas */
+    @media (max-width:1100px){
+      .banco-horas-content{flex-direction:column; align-items:stretch}
+      .donut-chart{margin:0 auto}
+      .bh-cards{flex-wrap:wrap}
+      .bh-card{min-width:calc(50% - 8px)}
+    }
+    @media (max-width:600px){
+      .bh-cards{flex-direction:column}
+      .bh-card{min-width:100%}
+    }
+
+    /* ROADMAP (PLANEJAMENTO) */
+    .roadmap-section{grid-column:1 / -1}
+    .roadmap-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-top:16px}
+    .roadmap-card{border-radius:12px; padding:20px; border:1px solid var(--stroke)}
+    .roadmap-card.green{background:linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)}
+    .roadmap-card.blue{background:linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)}
+    .roadmap-card.orange{background:linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)}
+    .roadmap-header{display:flex; align-items:center; gap:8px; margin-bottom:16px}
+    .roadmap-header .icon{font-size:20px}
+    .roadmap-header .period{font-size:16px; font-weight:700; color:var(--text)}
+    .roadmap-metrics{display:grid; grid-template-columns:repeat(2, 1fr); gap:12px}
+    .roadmap-metric{background:rgba(255,255,255,0.7); border-radius:10px; padding:14px; text-align:center; border:1px solid rgba(0,0,0,0.08)}
+    .roadmap-metric .value{font-size:28px; font-weight:800; line-height:1; margin-bottom:4px}
+    .roadmap-metric .value.green{color:#059669}
+    .roadmap-metric .value.blue{color:#2563EB}
+    .roadmap-metric .value.orange{color:#D97706}
+    .roadmap-metric .label{font-size:12px; color:var(--muted); font-weight:500}
+
+    @media (max-width:900px){
+      .roadmap-grid{grid-template-columns:1fr}
+    }
+
+    /* PUC */
+    .labels-section{grid-column:1 / -1}
+    .labels-grid{display:grid; grid-template-columns:repeat(5, 1fr); gap:16px; margin-top:16px}
+    .label-card{border-radius:12px; padding:20px; text-align:center; border:1px solid var(--stroke)}
+    .label-card.critico{background:linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%)}
+    .label-card.urgente{background:linear-gradient(135deg, #FED7AA 0%, #FDBA74 100%)}
+    .label-card.prioridade{background:linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)}
+    .label-card.despriorizado{background:linear-gradient(135deg, #E9D5FF 0%, #D8B4FE 100%)}
+    .label-card.sem{background:linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%)}
+    .label-icon{font-size:24px; margin-bottom:8px}
+    .label-value{font-size:32px; font-weight:800; line-height:1; margin-bottom:4px}
+    .label-value.critico{color:#DC2626}
+    .label-value.urgente{color:#EA580C}
+    .label-value.prioridade{color:#2563EB}
+    .label-value.despriorizado{color:#9333EA}
+    .label-value.sem{color:#6B7280}
+    .label-name{font-size:13px; color:var(--muted); font-weight:600}
+
+    @media (max-width:1100px){
+      .labels-grid{grid-template-columns:repeat(3, 1fr)}
+    }
+    @media (max-width:600px){
+      .labels-grid{grid-template-columns:1fr}
+    }
+
+    /* KPIs */
+    .kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px}
+    .kpi-card{background:var(--card); border:1px solid var(--stroke); border-radius:14px; padding:16px; box-shadow:0 2px 6px rgba(0,0,0,0.05)}
+    .kpi-card .tag{display:inline-flex; padding:4px 10px; border-radius:999px; font-size:12px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted); font-weight:600; margin-bottom:12px}
+    .kpi-card .tag.ok{background:rgba(0,164,67,.12); color:var(--ok); border-color:rgba(0,164,67,.3)}
+    .kpi-card .tag.danger{background:rgba(239,68,68,.15); color:var(--danger); border-color:rgba(239,68,68,.35)}
+    .kpi-card .kpi-value{display:flex; align-items:baseline; justify-content:space-between; border-top:1px dashed var(--stroke); padding-top:12px; margin-top:8px}
+    .kpi-card .kpi-value .big{font-size:32px; font-weight:800}
+    .kpi-card .kpi-value .muted{font-size:13px; color:var(--muted)}
+
+    /* Distribuição */
+    .dist-section{grid-column:1 / -1}
+    .dist-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:12px}
+    .tile{background:var(--card); border:1px solid var(--stroke); border-radius:12px; padding:14px}
+    .tile .name{font-weight:700; margin:0 0 8px; font-size:14px}
+    .tile .bar{height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden; margin-bottom:8px}
+    .tile .fill{height:8px; background:linear-gradient(90deg, var(--primary), #7C3AED)}
+    .tile .foot{display:flex; justify-content:space-between; color:var(--muted); font-size:12px}
+
+    @media (max-width:1100px){.dist-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:600px){.dist-grid{grid-template-columns:1fr}}
+
+    /* Tabela */
+    .table-section{grid-column:1 / -1}
+    .table-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
+    table{width:100%; border-collapse:collapse; font-size:14px}
+    th,td{padding:12px 10px; border-bottom:1px solid var(--stroke); text-align:left; vertical-align:top}
+    th{color:var(--muted); font-weight:600; cursor:pointer; user-select:none}
+    th:hover{color:var(--text)}
+    tr:last-child td{border-bottom:none}
+    tbody tr:hover{background:var(--surface-2)}
+    .tag{display:inline-flex; padding:3px 8px; border-radius:999px; font-size:11px; background:var(--surface-2); border:1px solid var(--stroke); color:var(--muted); font-weight:600}
+    .tag.ok{background:rgba(0,164,67,.12); color:var(--ok); border-color:rgba(0,164,67,.3)}
+    .tag.warn{background:rgba(246,140,27,.15); color:var(--warn); border-color:rgba(246,140,27,.35)}
+    .tag.danger{background:rgba(239,68,68,.15); color:var(--danger); border-color:rgba(239,68,68,.35)}
+    .tag.info{background:rgba(44,182,255,.12); color:var(--primary); border-color:rgba(44,182,255,.3)}
+    .date.overdue{color:var(--danger);font-weight:700}
+    .date.stale{color:var(--warn);font-weight:700}
+
+    /* Filtros da Tabela */
+    .table-filters{display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap; align-items:center}
+    .table-filters select,
+    .table-filters input[type="text"]{
+      padding:8px 12px;
+      border:1px solid var(--stroke);
+      border-radius:8px;
+      font-size:14px;
+      background:white;
+      color:var(--text);
+      font-family:inherit;
+    }
+    .table-filters select{min-width:150px; cursor:pointer}
+    .table-filters select:hover{border-color:var(--primary)}
+    .table-filters input[type="text"]{flex:1; min-width:200px}
+    .table-filters button{
+      padding:8px 16px;
+      background:var(--surface-2);
+      border:1px solid var(--stroke);
+      border-radius:8px;
+      cursor:pointer;
+      font-size:14px;
+      font-weight:600;
+      color:var(--text);
+      transition:all 0.2s ease;
+    }
+    .table-filters button:hover{background:var(--surface-3); border-color:var(--muted)}
+
+    /* Link Externo na Tabela */
+    .project-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      text-decoration:none;
+      color:inherit;
+      transition:color 0.2s ease;
+    }
+    .project-link:hover{color:var(--primary)}
+    .project-link:hover .external-icon{color:var(--primary)}
+    .external-icon{
+      width:16px;
+      height:16px;
+      color:var(--muted);
+      flex-shrink:0;
+      transition:color 0.2s ease;
+    }
+
+    /* Tabela de Projetos */
+    #projectsTable{width:100%; border-collapse:collapse; font-size:14px; background:white}
+    #projectsTable thead{background:var(--surface-2); position:sticky; top:0; z-index:10}
+    #projectsTable th{
+      padding:12px 16px;
+      text-align:left;
+      font-weight:700;
+      color:var(--text);
+      border-bottom:2px solid var(--stroke);
+      white-space:nowrap;
+    }
+    #projectsTable tbody tr{transition:background 0.15s ease}
+    #projectsTable tbody tr:nth-child(even){background:var(--bg)} /* Zebra striping */
+    #projectsTable tbody tr:hover{background:#EFF6FF; cursor:pointer} /* Hover state */
+    #projectsTable td{
+      padding:12px 16px;
+      border-bottom:1px solid var(--stroke);
+      vertical-align:middle;
+    }
+
+    /* Barra de Progresso */
+    .progress-wrapper{display:flex; align-items:center; gap:8px; min-width:140px}
+    .progress-bar{
+      flex:1;
+      height:8px;
+      background:var(--surface-2);
+      border-radius:4px;
+      overflow:hidden;
+      position:relative;
+    }
+    .progress-fill{
+      height:100%;
+      border-radius:4px;
+      transition:width 0.3s ease;
+    }
+    .progress-fill.critical{background:linear-gradient(90deg, #EF4444, #DC2626)} /* 0-30% */
+    .progress-fill.warning{background:linear-gradient(90deg, #F68C1B, #EA580C)} /* 31-60% */
+    .progress-fill.info{background:linear-gradient(90deg, #2CB6FF, #0EA5E9)} /* 61-90% */
+    .progress-fill.success{background:linear-gradient(90deg, #00A443, #16A34A)} /* 91-100% */
+    .progress-text{font-size:13px; font-weight:600; color:var(--text); min-width:45px; text-align:right}
+
+    /* Badges PUC */
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 10px;
+      border-radius:12px;
+      font-size:12px;
+      font-weight:600;
+      white-space:nowrap;
+    }
+    .badge.critico{background:#FEE2E2; color:#991B1B; border:1px solid #FCA5A5}
+    .badge.urgente{background:#FFEDD5; color:#9A3412; border:1px solid #FED7AA}
+    .badge.prioridade{background:#DBEAFE; color:#1E40AF; border:1px solid #93C5FD}
+    .badge.despriorizado{background:#F3E8FF; color:#6B21A8; border:1px solid #D8B4FE}
+    .badge.sem-etiqueta{background:#F3F4F6; color:#4B5563; border:1px solid #D1D5DB}
+
+    /* Indicador de Entrega */
+    .delivery-date{display:flex; align-items:center; gap:6px; font-size:13px}
+    .delivery-date.ok{color:var(--ok)}
+    .delivery-date.warning{color:var(--warn)}
+    .delivery-date.overdue{color:var(--danger); font-weight:700}
+    .delivery-icon{font-size:16px}
+
+    /* Badges Roadmap */
+    .roadmap-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:4px 8px;
+      border-radius:8px;
+      font-size:12px;
+      font-weight:600;
+    }
+    .roadmap-badge.days-30{background:#D1FAE5; color:#065F46; border:1px solid #6EE7B7}
+    .roadmap-badge.days-60{background:#DBEAFE; color:#1E40AF; border:1px solid #93C5FD}
+    .roadmap-badge.days-90{background:#FEF3C7; color:#92400E; border:1px solid #FCD34D}
+
+    /* Footer */
+    footer{padding:20px 24px; border-top:1px solid var(--stroke); color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:13px}
+
+    /* Mensagens */
+    #msg{padding:12px 24px;color:var(--muted);background:var(--surface-2);border-bottom:1px solid var(--stroke);font-size:13px}
+    .hidden{display:none}
+
+    /* Diagnóstico */
+    details{margin:12px 24px}
+    details summary{cursor:pointer; font-weight:600; color:var(--primary)}
+    details pre{white-space:pre-wrap; font-size:11px; color:var(--muted); background:#0e1116; border:1px solid var(--stroke); border-radius:10px; padding:12px; max-height:200px; overflow:auto; margin-top:8px}
+  </style>
+</head>
+<body>
+  <div class="brandbar" aria-hidden="true"></div>
+  
+  <header>
+    <div class="brand">
+      <h1>Dashboard Executivo — Neoenergia × Wittel</h1>
+    </div>
+    <div class="actions" role="group" aria-label="Carregar dados">
+      <button id="btnReload" class="btn" style="display:none">🔄 Recarregar Dados</button>
+      <div id="fileWrap" class="file-wrap">
+        <span id="fileLabel" class="file-label" aria-live="polite">📂 Carregar JSON Local</span>
+        <input id="fileInput" type="file" accept=".json,application/json" aria-describedby="fileHelp">
+      </div>
+      <span id="hdrStatus" class="status-pill">Carregando dados...</span>
+    </div>
+  </header>
+
+  <div id="msg">Pronto para carregar um JSON do Trello…</div>
+  
+  <details id="dbg">
+    <summary>Diagnóstico</summary>
+    <pre id="dbgLog"></pre>
+  </details>
+
+  <main>
+    <div class="hero" aria-label="Apresentação do dashboard">
+      <h1>Visão Geral dos Projetos</h1>
+    </div>
+
+    <!-- PAINEL BANCO DE HORAS -->
+    <div id="bancoHorasPanel" class="card banco-horas-panel">
+      <h2>Painel Banco de Horas</h2>
+      <div id="bancoHorasContent" class="banco-horas-content">
+        <div class="donut-chart">
+          <svg viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#E5E7EB" stroke-width="20"/>
+            <circle id="donutProgress" cx="100" cy="100" r="80" fill="none" stroke="#2CB6FF" stroke-width="20" stroke-dasharray="0 502.65" stroke-linecap="round"/>
+          </svg>
+          <div class="donut-text">
+            <span id="donutPercentage" class="percentage">0%</span>
+            <span class="label">Consumido</span>
+          </div>
+        </div>
+        <div class="bh-cards">
+          <div class="bh-card">
+            <div class="label">Atualização</div>
+            <div id="bhAtualizacao" class="value small">—</div>
+          </div>
+          <div class="bh-card">
+            <div class="label">Total</div>
+            <div id="bhTotal" class="value">—</div>
+          </div>
+          <div class="bh-card">
+            <div class="label">Consumidas</div>
+            <div id="bhConsumidas" class="value blue">—</div>
+          </div>
+          <div class="bh-card">
+            <div class="label">Saldo</div>
+            <div id="bhSaldo" class="value green">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROADMAP (PLANEJAMENTO) -->
+    <div class="card roadmap-section">
+      <h2>Roadmap (Planejamento)</h2>
+      <div class="roadmap-grid">
+        <!-- 30 dias -->
+        <div class="roadmap-card green">
+          <div class="roadmap-header">
+            <span class="icon">⚡</span>
+            <span class="period">30 dias</span>
+          </div>
+          <div class="roadmap-metrics">
+            <div class="roadmap-metric">
+              <div id="roadmap30Horas" class="value green">0h</div>
+              <div class="label">Horas</div>
+            </div>
+            <div class="roadmap-metric">
+              <div id="roadmap30Projetos" class="value green">0</div>
+              <div class="label">Projetos</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 60 dias -->
+        <div class="roadmap-card blue">
+          <div class="roadmap-header">
+            <span class="icon">🎯</span>
+            <span class="period">60 dias</span>
+          </div>
+          <div class="roadmap-metrics">
+            <div class="roadmap-metric">
+              <div id="roadmap60Horas" class="value blue">0h</div>
+              <div class="label">Horas</div>
+            </div>
+            <div class="roadmap-metric">
+              <div id="roadmap60Projetos" class="value blue">0</div>
+              <div class="label">Projetos</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 90 dias -->
+        <div class="roadmap-card orange">
+          <div class="roadmap-header">
+            <span class="icon">🕐</span>
+            <span class="period">90 dias</span>
+          </div>
+          <div class="roadmap-metrics">
+            <div class="roadmap-metric">
+              <div id="roadmap90Horas" class="value orange">0h</div>
+              <div class="label">Horas</div>
+            </div>
+            <div class="roadmap-metric">
+              <div id="roadmap90Projetos" class="value orange">0</div>
+              <div class="label">Projetos</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PUC -->
+    <div class="card labels-section">
+      <h2>PUC</h2>
+      <div class="labels-grid">
+        <!-- Crítico -->
+        <div class="label-card critico">
+          <div class="label-icon">⚠️</div>
+          <div id="labelCritico" class="label-value critico">0</div>
+          <div class="label-name">Crítico</div>
+        </div>
+        
+        <!-- Urgente -->
+        <div class="label-card urgente">
+          <div class="label-icon">🔥</div>
+          <div id="labelUrgente" class="label-value urgente">0</div>
+          <div class="label-name">Urgente</div>
+        </div>
+        
+        <!-- Prioridade -->
+        <div class="label-card prioridade">
+          <div class="label-icon">⭐</div>
+          <div id="labelPrioridade" class="label-value prioridade">0</div>
+          <div class="label-name">Prioridade</div>
+        </div>
+        
+        <!-- Despriorizado -->
+        <div class="label-card despriorizado">
+          <div class="label-icon">⏸️</div>
+          <div id="labelDespriorizado" class="label-value despriorizado">0</div>
+          <div class="label-name">Despriorizado</div>
+        </div>
+        
+        <!-- Sem etiqueta -->
+        <div class="label-card sem">
+          <div class="label-icon">📋</div>
+          <div id="labelSem" class="label-value sem">0</div>
+          <div class="label-name">Sem etiqueta</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi-card">
+        <span class="tag">Cards Total</span>
+        <div class="kpi-value">
+          <span id="kpiTotal" class="big">0</span>
+          <span id="kpiTotalPct" class="muted">—</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="tag">Cards Ativos</span>
+        <div class="kpi-value">
+          <span id="kpiAtivos" class="big">0</span>
+          <span id="kpiAtivosPct" class="muted">—</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="tag danger">Atrasados (final)</span>
+        <div class="kpi-value">
+          <span id="kpiAtrasadosFinal" class="big">0</span>
+          <span id="kpiAtrasadosFinalPct" class="muted">—</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="tag danger">Atrasados (Kanban)</span>
+        <div class="kpi-value">
+          <span id="kpiAtrasadosKanban" class="big">0</span>
+          <span id="kpiAtrasadosKanbanPct" class="muted">—</span>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <span class="tag ok">Finalizados</span>
+        <div class="kpi-value">
+          <span id="kpiFinalizados" class="big">0</span>
+          <span id="kpiFinalizadosPct" class="muted">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fora do fluxo -->
+    <div class="card dist-section">
+      <h2>Fora do fluxo <span style="color:var(--muted);font-size:14px;font-weight:400">· Neoenergia</span></h2>
+      <div id="distOut" class="dist-grid"></div>
+    </div>
+
+    <!-- Pré-projeto -->
+    <div class="card dist-section">
+      <h2>Pré-projeto <span style="color:var(--muted);font-size:14px;font-weight:400">· CSM Wittel</span></h2>
+      <div id="distPre" class="dist-grid"></div>
+    </div>
+
+    <!-- Projetos (execução) -->
+    <div class="card dist-section">
+      <h2>Projetos (execução)</h2>
+      <div id="distExec" class="dist-grid"></div>
+    </div>
+
+    <!-- CX -->
+    <div class="card dist-section">
+      <h2>CX</h2>
+      <div id="distCx" class="dist-grid"></div>
+    </div>
+
+    <!-- Tabela de projetos -->
+    <div class="card table-section">
+      <div class="table-header">
+        <h2>Projetos (Progresso %)</h2>
+        <div style="color:var(--muted);font-size:13px">Total: <span id="totalRows">0</span></div>
+      </div>
+      
+      <!-- Filtros -->
+      <div class="table-filters">
+        <select id="filterStatus">
+          <option value="">Todos os Status</option>
+        </select>
+        
+        <select id="filterPUC">
+          <option value="">Todas as Etiquetas</option>
+          <option value="Crítico">Crítico</option>
+          <option value="Urgente">Urgente</option>
+          <option value="Prioridade">Prioridade</option>
+          <option value="Despriorizado">Despriorizado</option>
+          <option value="">Sem etiqueta</option>
+        </select>
+        
+        <select id="filterResponsavel">
+          <option value="">Todos os Responsáveis</option>
+        </select>
+        
+        <select id="filterRoadmap">
+          <option value="">Todos os Roadmaps</option>
+          <option value="30">30 dias</option>
+          <option value="60">60 dias</option>
+          <option value="90">90 dias</option>
+        </select>
+        
+        <input type="text" id="filterSearch" placeholder="🔍 Buscar projeto...">
+        
+        <button id="btnClearFilters">Limpar Filtros</button>
+      </div>
+      
+      <table id="projects">
+        <thead>
+          <tr>
+            <th>Projetos</th>
+            <th>Responsável</th>
+            <th>Status</th>
+            <th>PUC</th>
+            <th>Entrega</th>
+            <th>Horas</th>
+            <th>Roadmap</th>
+            <th>Progresso</th>
+          </tr>
+        </thead>
+        <tbody id="projectsTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer>
+    <span>Dashboard local – seus dados não saem do navegador.</span>
+    <span>Carregue um export JSON do Trello.</span>
+  </footer>
+
+<script>
+"use strict";
+
+// ===== Helpers =====
+function $(sel){return document.querySelector(sel);}
+function $$(sel){return Array.from(document.querySelectorAll(sel));}
+function logd(){
+  var s=Array.from(arguments).map(function(x){
+    try{return typeof x==='string'?x:JSON.stringify(x);}catch(_){return String(x);}
+  }).join(' ');
+  var el=$('#dbgLog');
+  if(el){el.textContent+=s+'\n'; el.scrollTop=el.scrollHeight;}
+  if(window.console&&console.debug){console.debug('[DBG]',s);}
+}
+function setMsg(t,type){
+  var el=$('#msg');
+  if(el){el.textContent=t;}
+  var hs=$('#hdrStatus');
+  if(hs){
+    hs.textContent=t;
+    hs.className='status-pill';
+    if(type==='success') hs.className='status-pill success';
+    if(type==='error') hs.className='status-pill error';
+  }
+}
+
+function stripAccents(s){return s? s.normalize('NFD').replace(/[\u0300-\u036f]/g,''):'';}
+function norm(s){
+  s=String(s||'').trim().replace(/\s+/g,' ');
+  var k=stripAccents(s).toLowerCase();
+  if(k==='acompanha resultado'||k==='acompanha resultados') return 'acompanha resultados';
+  if(k==='concluido'||k==='concluído') return 'concluido';
+  if(k==='painel') return 'painel';
+  if(k==='backlog') return 'backlog';
+  if(k==='suspenso') return 'suspenso';
+  if(k==='cancelado') return 'cancelado';
+  return k;
+}
+function renderLabel(key){
+  if(key==='acompanha resultados') return 'Acompanha Resultados';
+  if(key==='concluido') return 'Concluído';
+  if(key==='painel') return 'Painel';
+  if(key==='backlog') return 'Backlog';
+  if(key==='suspenso') return 'Suspenso';
+  if(key==='cancelado') return 'Cancelado';
+  if(key==='revisao de projetos') return 'Revisão de projetos';
+  if(key==='debito tecnico') return 'Débito Técnico';
+  return key.split(' ').map(function(w){
+    var lows={de:1,da:1,do:1,dos:1,das:1,e:1,ou:1,em:1,no:1,na:1};
+    return lows[w]?w:(w.charAt(0).toUpperCase()+w.slice(1));
+  }).join(' ');
+}
+function titleCaseLike(str){
+  if(!str) return '';
+  var low=['de','da','do','dos','das','e','ou','em','no','na'];
+  return String(str).split(' ').map(function(w){
+    if(!w) return w;
+    return low.indexOf(w.toLowerCase())>-1 ? w.toLowerCase() : (w.charAt(0).toUpperCase()+w.slice(1));
+  }).join(' ');
+}
+function normalizeMember(raw){
+  if(!raw) return '—';
+  var key=String(raw).trim();
+  return MEMBER_MAP.get(key)||titleCaseLike(key);
+}
+function fmtPct(n){
+  if(isNaN(n)||n==null) return '—';
+  var v=Math.round(n*1000)/10;
+  return (v.toFixed(1).replace('.0',''))+'%';
+}
+function fmtDate(s){
+  if(!s) return '—';
+  var d=new Date(s);
+  if(isNaN(d)) return '—';
+  var dd=String(d.getDate()).padStart(2,'0');
+  var mm=String(d.getMonth()+1).padStart(2,'0');
+  var yyyy=d.getFullYear();
+  return dd+'/'+mm+'/'+yyyy;
+}
+function fmtDateTime(s){
+  if(!s) return '—';
+  var d=new Date(s);
+  if(isNaN(d)) return '—';
+  var months=['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+  var day=String(d.getDate()).padStart(2,'0');
+  var month=months[d.getMonth()];
+  var year=d.getFullYear();
+  var hour=String(d.getHours()).padStart(2,'0');
+  var min=String(d.getMinutes()).padStart(2,'0');
+  return day+'-'+month+'-'+year+' '+hour+':'+min;
+}
+function tagForPUC(puc){
+  var v=String(puc||'').toLowerCase();
+  if(v==='crítico'||v==='critico') return '<span class="tag danger">Crítico</span>';
+  if(v==='urgente') return '<span class="tag warn">Urgente</span>';
+  if(v==='prioridade') return '<span class="tag info">Prioridade</span>';
+  return '<span class="tag">—</span>';
+}
+function isOverdue(c){
+  try{
+    if(!c||!c.due) return false;
+    if(DONE_LIST_KEYS.has(c.listKey)||OUT_OF_FLOW_KEYS.has(c.listKey)) return false;
+    var d=new Date(c.due);
+    if(isNaN(d)) return false;
+    var today=new Date();
+    today.setHours(0,0,0,0);
+    return d < today;
+  }catch(_){return false;}
+}
+function isFinalOverdue(c){
+  try{
+    if(!c || !c.finalDue) return false;
+    if (DONE_LIST_KEYS.has(c.listKey) || OUT_OF_FLOW_KEYS.has(c.listKey)) return false;
+    var d = new Date(c.finalDue);
+    if (isNaN(d)) return false;
+    var today = new Date();
+    today.setHours(0,0,0,0);
+    return d < today;
+  }catch(_){return false;}
+}
+
+// ===== Config =====
+var STALE_DAYS = 10;
+var ORDERED_ACTIVE_LABELS=[
+  'Nova Demanda','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço',
+  'Planejamento','Cronograma','Debito Técnico','Construção da EF',
+  'Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev',
+  'QA Wittel','Certificação','Deploy'
+];
+var ORDERED_ACTIVE_KEYS=ORDERED_ACTIVE_LABELS.map(norm);
+var OUT_OF_FLOW_KEYS=new Set(['Cancelado','Suspenso','Backlog','Revisão de projetos'].map(norm));
+var DONE_LIST_KEYS=new Set(['Concluído','Acompanha Resultados'].map(norm));
+var EXCLUDE_FULL_LIST_KEYS=new Set(['Painel','Manual de Utilização'].map(norm));
+var MEMBER_MAP=new Map([
+  ['Beatriz Cristina Causs Barbieri','Beatriz Causs'],
+  ['ricardo.michelin','Ricardo Michelin'],
+  ['Renan mora rodrigues da silva','Renan Mora'],
+  ['Nataly Rubi Cardoso','Nataly Cardoso'],
+  ['mariany.felix','Mariany Felix'],
+  ['patricia.tasseli','Patricia Tasseli']
+]);
+
+// Custom Fields IDs
+var CUSTOM_FIELDS={
+  totalHoras:'68d2a03d137e18cee063f01b',
+  horasConsumidas:'68d2a1bc0b02290069fc52d9',
+  saldoAtual:'68d2a1de78193058841a5613',
+  roadMap:'68d3398b2d74e90938015095',
+  horasProjeto:'68d329a79021ffa41bcfad22'
+};
+
+function parseDateFromText(text){
+  try{
+    if(!text) return null;
+    var s=String(text).trim();
+    var parts = s.split(' ');
+    for(var i=0;i<parts.length;i++){
+      var t = parts[i];
+      if(!t) continue;
+      if(t.indexOf('/')>-1){
+        var a=t.split('/');
+        if(a.length===3){
+          var d=parseInt(a[0],10), mo=parseInt(a[1],10)-1, y=parseInt(a[2],10);
+          var dt=new Date(y,mo,d);
+          if(!isNaN(dt)) return dt;
+        }
+      }
+      if(t.indexOf('-')>-1){
+        var b=t.split('-');
+        if(b.length===3){
+          var y2=parseInt(b[0],10), mo2=parseInt(b[1],10)-1, d2=parseInt(b[2],10);
+          var dt2=new Date(y2,mo2,d2);
+          if(!isNaN(dt2)) return dt2;
+        }
+      }
+    }
+    return null;
+  }catch(_){return null;}
+}
+
+// ===== Parse Trello JSON =====
+function ingestTrello(raw){
+  try{
+    var listsById=new Map();
+    var membersById=new Map();
+    var checkAgg=new Map();
+    var finalDueByCard=new Map();
+    var cards=[];
+    var bancoHoras=null;
+
+    // Custom Fields
+    var customFieldsMap=new Map();
+    if(Array.isArray(raw.customFields)){
+      raw.customFields.forEach(function(cf){
+        customFieldsMap.set(cf.id, cf.name);
+      });
+    }
+
+    // Lists & Members
+    if(Array.isArray(raw.lists)){
+      raw.lists.forEach(function(l){
+        listsById.set(l.id,{id:l.id,name:String(l.name||'').trim(),closed:!!l.closed});
+      });
+    }
+    if(Array.isArray(raw.members)){
+      raw.members.forEach(function(m){
+        var name=m.fullName||m.username||m.name||'';
+        membersById.set(m.id, normalizeMember(name));
+      });
+    }
+
+    // Checklists
+    if(Array.isArray(raw.checklists)){
+      raw.checklists.forEach(function(cl){
+        var items=Array.isArray(cl.checkItems)? cl.checkItems : [];
+        var done=items.filter(function(i){return String(i.state).toLowerCase()==='complete';}).length;
+        var total=items.length;
+        var cur=checkAgg.get(cl.idCard)||{done:0,total:0};
+        checkAgg.set(cl.idCard,{done:cur.done+done,total:cur.total+total});
+        var clKey=norm(cl.name||'');
+        if(clKey.indexOf('data de entrega')>-1){
+          var best=null;
+          items.forEach(function(it){
+            var d=parseDateFromText(it && it.name);
+            if(d){
+              if(!best || d>best) best=d;
+            }
+          });
+          if(best) finalDueByCard.set(cl.idCard, best.toISOString());
+        }
+      });
+    }
+
+    // Cards
+    var rawOpenCount = Array.isArray(raw.cards)? raw.cards.filter(function(c){return !c.closed;}).length : 0;
+    if(Array.isArray(raw.cards)){
+      raw.cards.filter(function(c){return !c.closed;}).forEach(function(c){
+        var list=listsById.get(c.idList);
+        var rawListName = list? list.name : (c.listName||'');
+        rawListName = String(rawListName||'').trim();
+        
+        // Normaliza sinônimos
+        var pairs = [
+          ['Levantamento do Esforço','Levantamento de Esforço'],
+          ['Aprovação do Esforço','Aprovação de Esforço'],
+          ['Construção EF','Construção da EF'],
+          ['Confirmacao da EF (WTec)','Confirmação da EF (WTéc)'],
+          ['Confirmação EF (WTec)','Confirmação da EF (WTéc)'],
+          ['Validacao EF','Validação EF'],
+          ['A fazer','Nova Demanda'],
+          ['A Fazer','Nova Demanda']
+        ];
+        var k = norm(rawListName);
+        for (var i=0;i<pairs.length;i++){
+          if (norm(pairs[i][0])===k) {
+            rawListName = pairs[i][1];
+            break;
+          }
+        }
+        
+        var listName = rawListName;
+        var listKey = norm(listName);
+
+        // Verifica se é o card Banco de Horas
+        var cardNameLower = c.name.toLowerCase();
+        if(cardNameLower.indexOf('banco')>-1 && cardNameLower.indexOf('hora')>-1){
+          // Extrair custom fields
+          var total=null, consumidas=null, saldo=null;
+          if(Array.isArray(c.customFieldItems)){
+            c.customFieldItems.forEach(function(cfi){
+              if(cfi.idCustomField===CUSTOM_FIELDS.totalHoras && cfi.value && cfi.value.number){
+                total=parseFloat(cfi.value.number);
+              }
+              if(cfi.idCustomField===CUSTOM_FIELDS.horasConsumidas && cfi.value && cfi.value.number){
+                consumidas=parseFloat(cfi.value.number);
+              }
+              if(cfi.idCustomField===CUSTOM_FIELDS.saldoAtual && cfi.value && cfi.value.number){
+                saldo=parseFloat(cfi.value.number);
+              }
+            });
+          }
+          bancoHoras={
+            total:total,
+            consumidas:consumidas,
+            saldo:saldo,
+            atualizacao:c.dateLastActivity
+          };
+          logd('Banco de Horas encontrado:', bancoHoras);
+          return; // Não adiciona aos cards de projetos
+        }
+
+        // PUC
+        var puc=null;
+        if(Array.isArray(c.labels)){
+          var names=c.labels.map(function(l){return (l.name||'').toLowerCase();});
+          if(names.indexOf('crítico')>-1||names.indexOf('critico')>-1) puc='Crítico';
+          else if(names.indexOf('urgente')>-1) puc='Urgente';
+          else if(names.indexOf('prioridade')>-1) puc='Prioridade';
+        } else if(typeof c.puc==='string'){
+          puc=c.puc;
+        }
+
+        // Owner
+        var owner='—';
+        if(Array.isArray(c.idMembers) && c.idMembers.length){
+          var m=membersById.get(c.idMembers[0]);
+          if(m) owner=m;
+        } else if(c.member){
+          owner=normalizeMember(c.member);
+        }
+
+        // Progress
+        var agg=checkAgg.get(c.id)||{done:0,total:0};
+        var progress=agg.total>0? (agg.done/agg.total):null;
+
+        // RoadMap e Horas do Projeto (converter para número)
+        var roadMap=null, horasProjeto=null;
+        if(Array.isArray(c.customFieldItems)){
+          c.customFieldItems.forEach(function(cfi){
+            if(cfi.idCustomField===CUSTOM_FIELDS.roadMap && cfi.value && cfi.value.number){
+              roadMap=Number(cfi.value.number);
+            }
+            if(cfi.idCustomField===CUSTOM_FIELDS.horasProjeto && cfi.value && cfi.value.number){
+              horasProjeto=Number(cfi.value.number);
+            }
+          });
+        }
+
+        // Dates
+        var finalDue=finalDueByCard.get(c.id)||null;
+        var dueVal=c.due||c.dueDate||c.dataEntrega||null;
+        var updatedAt = c.dateLastActivity || null;
+        try {
+          if (updatedAt) {
+            var u=new Date(updatedAt);
+            var today=new Date();
+            today.setHours(0,0,0,0);
+            if (u>today) updatedAt=today.toISOString();
+          }
+        } catch(_) {}
+
+        var url=c.url || (c.shortLink? ('https://trello.com/c/'+c.shortLink): null);
+        var shortUrl = c.shortUrl || url;
+
+        // Labels
+        var labels = [];
+        if(Array.isArray(c.labels)){
+          labels = c.labels.map(function(l){
+            return {name: l.name || '', color: l.color || ''};
+          });
+        }
+
+        // Checklists (para cálculo de progresso)
+        var allChecklists = [];
+        if(Array.isArray(raw.checklists)){
+          allChecklists = raw.checklists.filter(function(cl){
+            return cl.idCard === c.id;
+          });
+        }
+
+        cards.push({
+          id:c.id,
+          name:String(c.name||'').trim(),
+          list:listName,
+          listKey:listKey,
+          due:dueVal,
+          finalDue:finalDue,
+          owner:owner,
+          puc:puc,
+          progress:progress,
+          updatedAt:updatedAt,
+          url:url,
+          shortUrl:shortUrl,
+          roadMap:roadMap,
+          horasProjeto:horasProjeto,
+          labels:labels,
+          allChecklists:allChecklists
+        });
+      });
+    }
+
+    // Exclusões
+    cards=cards.filter(function(c){
+      return !EXCLUDE_FULL_LIST_KEYS.has(c.listKey);
+    });
+    cards=cards.filter(function(c){
+      return norm(c.name) !== norm(c.list);
+    });
+
+    return {cards:cards, rawOpenCount: rawOpenCount, bancoHoras:bancoHoras};
+  }catch(err){
+    console.error('ingestTrello error:', err);
+    throw err;
+  }
+}
+
+// ===== Calcular Progresso do Card =====
+function calculateCardProgress(card){
+  if(!card.allChecklists || card.allChecklists.length === 0) return null;
+  
+  var totalItems = 0;
+  var completedItems = 0;
+  
+  card.allChecklists.forEach(function(checklist){
+    // Excluir checklist "Data de Entrega"
+    var checklistName = (checklist.name || '').toLowerCase();
+    if(checklistName.indexOf('data') > -1 && checklistName.indexOf('entrega') > -1) return;
+    
+    if(Array.isArray(checklist.checkItems)){
+      checklist.checkItems.forEach(function(item){
+        totalItems++;
+        if(item.state === 'complete') completedItems++;
+      });
+    }
+  });
+  
+  if(totalItems === 0) return null;
+  return completedItems / totalItems;
+}
+
+// ===== Calcular Estatísticas de Etiquetas =====
+function calculateLabelStats(cards){
+  var EXCLUDE_LISTS = ['painel','manual de utilizacao','acompanha resultados','concluido'];
+  
+  var stats = {
+    critico: 0,
+    urgente: 0,
+    prioridade: 0,
+    despriorizado: 0,
+    sem: 0
+  };
+  
+  cards.forEach(function(c){
+    if(EXCLUDE_LISTS.indexOf(c.listKey) > -1) return;
+    
+    if(!c.labels || c.labels.length === 0){
+      stats.sem++;
+    } else {
+      var labelName = c.labels[0].name.toLowerCase();
+      if(labelName === 'crítico' || labelName === 'critico') stats.critico++;
+      else if(labelName === 'urgente') stats.urgente++;
+      else if(labelName === 'prioridade') stats.prioridade++;
+      else if(labelName === 'despriorizado') stats.despriorizado++;
+      else stats.sem++;
+    }
+  });
+  
+  return stats;
+}
+
+function renderLabelStats(stats){
+  $('#labelCritico').textContent = stats.critico;
+  $('#labelUrgente').textContent = stats.urgente;
+  $('#labelPrioridade').textContent = stats.prioridade;
+  $('#labelDespriorizado').textContent = stats.despriorizado;
+  $('#labelSem').textContent = stats.sem;
+}
+
+// ===== Calcular Roadmap =====
+function calculateRoadmap(cards){
+  var roadmap30 = {horas:0, projetos:0};
+  var roadmap60 = {horas:0, projetos:0};
+  var roadmap90 = {horas:0, projetos:0};
+
+  // Listas válidas para Roadmap (11 listas) - normalizadas manualmente
+  var ROADMAP_VALID_KEYS = new Set([
+    'planejamento',
+    'cronograma',
+    'construcao da ef',
+    'confirmacao da ef (wtec)',
+    'validacao ef',
+    'pronto para dev',
+    'dev',
+    'qa wittel',
+    'certificacao',
+    'correcoes e ajustes',
+    'deploy'
+  ]);
+
+  cards.forEach(function(c){
+    // Normalizar lista do card
+    var listNorm = stripAccents(String(c.list||'').toLowerCase().trim().replace(/\s+/g,' '));
+    
+    // Verificar se está em uma das 11 listas válidas
+    if(!ROADMAP_VALID_KEYS.has(listNorm)){
+      return;
+    }
+
+    // Verificar se tem RoadMap preenchido
+    if(!c.roadMap) return;
+
+    // Classificar por valor do RoadMap (usar == pois valor pode ser string)
+    if(c.roadMap == 30){
+      roadmap30.horas += (c.horasProjeto || 0);
+      roadmap30.projetos += 1;
+      logd('Roadmap 30:', c.name, '-', c.horasProjeto||0, 'h');
+    } else if(c.roadMap == 60){
+      roadmap60.horas += (c.horasProjeto || 0);
+      roadmap60.projetos += 1;
+      logd('Roadmap 60:', c.name, '-', c.horasProjeto||0, 'h');
+    } else if(c.roadMap == 90){
+      roadmap90.horas += (c.horasProjeto || 0);
+      roadmap90.projetos += 1;
+      logd('Roadmap 90:', c.name, '-', c.horasProjeto||0, 'h');
+    }
+  });
+
+  return {
+    roadmap30: roadmap30,
+    roadmap60: roadmap60,
+    roadmap90: roadmap90
+  };
+}
+
+// ===== Render Roadmap =====
+function renderRoadmap(data){
+  // 30 dias
+  var h30 = $('#roadmap30Horas');
+  if(h30) h30.textContent = Math.round(data.roadmap30.horas) + 'h';
+  var p30 = $('#roadmap30Projetos');
+  if(p30) p30.textContent = data.roadmap30.projetos;
+
+  // 60 dias
+  var h60 = $('#roadmap60Horas');
+  if(h60) h60.textContent = Math.round(data.roadmap60.horas) + 'h';
+  var p60 = $('#roadmap60Projetos');
+  if(p60) p60.textContent = data.roadmap60.projetos;
+
+  // 90 dias
+  var h90 = $('#roadmap90Horas');
+  if(h90) h90.textContent = Math.round(data.roadmap90.horas) + 'h';
+  var p90 = $('#roadmap90Projetos');
+  if(p90) p90.textContent = data.roadmap90.projetos;
+
+  logd('Roadmap renderizado:', JSON.stringify(data));
+}
+
+// ===== Render Banco de Horas =====
+function renderBancoHoras(bh){
+  if(!bh || bh.total==null){
+    $('#bancoHorasContent').innerHTML='<div style="color:var(--muted);text-align:center;padding:20px">Banco de horas não encontrado no JSON. Verifique se existe um card chamado "Banco de horas" com os custom fields preenchidos.</div>';
+    return;
+  }
+
+  var total=bh.total||0;
+  var consumidas=bh.consumidas||0;
+  var saldo=bh.saldo||0;
+  var pct = total>0? (consumidas/total)*100 : 0;
+
+  // Atualizar gráfico donut
+  var circumference = 2 * Math.PI * 80; // 502.65
+  var dashLength = (pct / 100) * circumference;
+  var donutCircle = $('#donutProgress');
+  if(donutCircle){
+    donutCircle.setAttribute('stroke-dasharray', dashLength + ' ' + circumference);
+  }
+
+  // Atualizar percentual
+  var donutPct = $('#donutPercentage');
+  if(donutPct){
+    donutPct.textContent = pct.toFixed(1) + '%';
+  }
+
+  // Atualizar cards
+  var bhAtualizacao = $('#bhAtualizacao');
+  if(bhAtualizacao){
+    bhAtualizacao.textContent = fmtDateTime(bh.atualizacao);
+  }
+
+  var bhTotal = $('#bhTotal');
+  if(bhTotal){
+    bhTotal.textContent = total.toLocaleString('pt-BR') + 'h';
+  }
+
+  var bhConsumidas = $('#bhConsumidas');
+  if(bhConsumidas){
+    bhConsumidas.textContent = consumidas.toLocaleString('pt-BR') + 'h';
+  }
+
+  var bhSaldo = $('#bhSaldo');
+  if(bhSaldo){
+    bhSaldo.textContent = saldo.toLocaleString('pt-BR') + 'h';
+  }
+
+  logd('Banco de Horas renderizado:', {total:total, consumidas:consumidas, saldo:saldo, pct:pct.toFixed(1)+'%'});
+}
+
+// ===== Compute & Render =====
+function compute(cards, rawOpen){
+  var GROUP_OUT_LABELS = ['Cancelado','Suspenso','Backlog','Revisão de projetos'];
+  var GROUP_PRE_LABELS = ['Nova Demanda','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'];
+  var GROUP_EXEC_LABELS = ['Debito Técnico','Planejamento','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Correções e Ajustes','Deploy'];
+  var GROUP_CX_LABELS  = ['Acompanha Resultados'];
+
+  var totalValid=cards.length;
+  var doneCount=cards.filter(function(c){return DONE_LIST_KEYS.has(c.listKey);}).length;
+
+  var byList=new Map(ORDERED_ACTIVE_LABELS.map(function(s){return [norm(s),0];}));
+  cards.forEach(function(c){
+    if(byList.has(c.listKey)){
+      byList.set(c.listKey,(byList.get(c.listKey)||0)+1);
+    }
+  });
+  var activeCount = 0;
+  byList.forEach(function(v){ activeCount += v||0; });
+
+  function buildGroup(labels){
+    var m=new Map(labels.map(function(s){return [norm(s),0];}));
+    cards.forEach(function(c){
+      if(m.has(c.listKey)){
+        m.set(c.listKey,(m.get(c.listKey)||0)+1);
+      }
+    });
+    return m;
+  }
+
+  var byOut = buildGroup(GROUP_OUT_LABELS);
+  var byPre = buildGroup(GROUP_PRE_LABELS);
+  var byExec = buildGroup(GROUP_EXEC_LABELS);
+  var byCx = buildGroup(GROUP_CX_LABELS);
+
+  var sorted=cards.slice().sort(function(a,b){
+    var aOut=OUT_OF_FLOW_KEYS.has(a.listKey)?1:0;
+    var bOut=OUT_OF_FLOW_KEYS.has(b.listKey)?1:0;
+    if(aOut!==bOut) return aOut-bOut;
+    var afo=isFinalOverdue(a)?1:0, bfo=isFinalOverdue(b)?1:0;
+    if(afo!==bfo) return bfo-afo;
+    var ao=isOverdue(a)?1:0, bo=isOverdue(b)?1:0;
+    if(ao!==bo) return bo-ao;
+    var ap=(a.progress==null? -1:a.progress);
+    var bp=(b.progress==null? -1:b.progress);
+    return bp-ap;
+  });
+
+  var overdueFinalCount=cards.filter(function(c){ return isFinalOverdue(c); }).length;
+  var overdueStageCount=cards.filter(function(c){ return isOverdue(c); }).length;
+
+  var members=Array.from(cards.reduce(function(m,c){
+    var k=c.owner||'—';
+    m.set(k,(m.get(k)||0)+1);
+    return m;
+  }, new Map()).entries()).map(function(e){
+    return {name:e[0],count:e[1]};
+  }).sort(function(a,b){
+    return a.name.localeCompare(b.name);
+  });
+
+  return {
+    totalValid:totalValid,
+    rawTotal: rawOpen,
+    activeCount:activeCount,
+    doneCount:doneCount,
+    overdueFinalCount:overdueFinalCount,
+    overdueStageCount:overdueStageCount,
+    byList:byList,
+    byOut:byOut,
+    byPre:byPre,
+    byExec:byExec,
+    byCx:byCx,
+    members:members,
+    sorted:sorted
+  };
+}
+
+function renderKpis(m){
+  $('#kpiTotal').textContent=m.totalValid;
+  $('#kpiTotalPct').textContent=(m && m.rawTotal)? fmtPct(m.totalValid / m.rawTotal) : '—';
+  
+  $('#kpiAtivos').textContent=m.activeCount;
+  $('#kpiAtivosPct').textContent=m.totalValid? fmtPct(m.activeCount/m.totalValid):'—';
+  
+  $('#kpiAtrasadosKanban').textContent=m.overdueStageCount;
+  $('#kpiAtrasadosKanbanPct').textContent=m.totalValid? fmtPct(m.overdueStageCount/m.totalValid):'—';
+  
+  $('#kpiAtrasadosFinal').textContent=m.overdueFinalCount;
+  $('#kpiAtrasadosFinalPct').textContent=m.totalValid? fmtPct(m.overdueFinalCount/m.totalValid):'—';
+  
+  $('#kpiFinalizados').textContent=m.doneCount;
+  $('#kpiFinalizadosPct').textContent=m.totalValid? fmtPct(m.doneCount/m.totalValid):'—';
+}
+
+function renderKanbanGroup(containerId, labels, map){
+  var wrap=document.getElementById(containerId);
+  if(!wrap) return;
+  wrap.innerHTML='';
+  var total=0;
+  labels.forEach(function(s){ total += (map.get(norm(s))||0); });
+  labels.forEach(function(label){
+    var key=norm(label);
+    var qty=map.get(key)||0;
+    var pct= total? (qty/total):0;
+    var el=document.createElement('div');
+    el.className='tile';
+    el.innerHTML='<div class="name">'+label+'</div><div class="bar"><div class="fill" style="width:'+Math.round(pct*100)+'%"></div></div><div class="foot"><span>'+qty+' cards</span><span>'+fmtPct(pct)+'</span></div>';
+    wrap.appendChild(el);
+  });
+}
+
+function renderMembers(members){
+  var wrap=$('#members');
+  if(!wrap){return;}
+  wrap.innerHTML='';
+  if(!members.length){
+    wrap.innerHTML='<div style="color:var(--muted)">Sem responsáveis informados.</div>';
+    return;
+  }
+  var universe=members.reduce(function(s,m){return s+m.count;},0);
+  members.forEach(function(m){
+    var pct=universe? (m.count/universe):0;
+    var el=document.createElement('div');
+    el.className='member-item';
+    el.innerHTML='<div class="member-row"><div>'+m.name+'</div><div style="color:var(--muted)">'+m.count+' • '+fmtPct(pct)+'</div></div><div class="member-bar"><div class="member-fill" style="width:'+Math.round(pct*100)+'%"></div></div>';
+    wrap.appendChild(el);
+  });
+}
+
+function renderProjects(rows){
+  var tbody=$('#projectsTableBody');
+  if(!tbody) return;
+  tbody.innerHTML='';
+  $('#totalRows').textContent=rows.length;
+  
+  rows.forEach(function(c){
+    var tr=document.createElement('tr');
+    
+    // Coluna 1: Projetos (com link externo)
+    var tdProject = document.createElement('td');
+    var link = document.createElement('a');
+    link.href = c.shortUrl || c.url || '#';
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.className = 'project-link';
+    link.innerHTML = '<svg class="external-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg><span>'+c.name+'</span>';
+    tdProject.appendChild(link);
+    tr.appendChild(tdProject);
+    
+    // Coluna 2: Responsável
+    var tdResp = document.createElement('td');
+    tdResp.textContent = c.owner || '—';
+    tr.appendChild(tdResp);
+    
+    // Coluna 3: Status (Lista)
+    var tdStatus = document.createElement('td');
+    tdStatus.textContent = renderLabel(c.listKey);
+    tr.appendChild(tdStatus);
+    
+    // Coluna 4: PUC (Badge colorido)
+    var tdPUC = document.createElement('td');
+    if(c.labels && c.labels.length > 0){
+      var labelName = c.labels[0].name;
+      var badgeClass = '';
+      var badgeIcon = '';
+      if(labelName === 'Crítico'){
+        badgeClass = 'critico';
+        badgeIcon = '⚠️';
+      } else if(labelName === 'Urgente'){
+        badgeClass = 'urgente';
+        badgeIcon = '🔥';
+      } else if(labelName === 'Prioridade'){
+        badgeClass = 'prioridade';
+        badgeIcon = '⭐';
+      } else if(labelName === 'Despriorizado'){
+        badgeClass = 'despriorizado';
+        badgeIcon = '⏸️';
+      } else {
+        badgeClass = 'sem-etiqueta';
+        badgeIcon = '📋';
+      }
+      tdPUC.innerHTML = '<span class="badge '+badgeClass+'">'+badgeIcon+' '+labelName+'</span>';
+    } else {
+      tdPUC.innerHTML = '<span class="badge sem-etiqueta">📋 Sem etiqueta</span>';
+    }
+    tr.appendChild(tdPUC);
+    
+    // Coluna 5: Entrega (com indicador de atraso)
+    var tdEntrega = document.createElement('td');
+    if(c.finalDue){
+      // Verificar se o card está em lista finalizada
+      var isFinished = DONE_LIST_KEYS.has(c.listKey);
+      
+      if(isFinished){
+        // Cards finalizados: apenas mostrar data sem indicador de atraso
+        tdEntrega.innerHTML = '<div class="delivery-date ok"><span>'+fmtDate(c.finalDue)+'</span><span class="delivery-icon">✅</span></div>';
+      } else {
+        // Cards ativos: aplicar lógica normal de atraso
+        var today = new Date();
+        today.setHours(0,0,0,0);
+        var dueDate = new Date(c.finalDue);
+        dueDate.setHours(0,0,0,0);
+        var diffDays = Math.ceil((dueDate - today) / (1000*60*60*24));
+        
+        var statusClass = '';
+        var statusIcon = '';
+        var statusText = '';
+        
+        if(diffDays < 0){
+          statusClass = 'overdue';
+          statusIcon = '⚠️';
+          statusText = ' (atrasado '+Math.abs(diffDays)+' dias)';
+        } else if(diffDays === 0){
+          statusClass = 'warning';
+          statusIcon = '⏰';
+          statusText = ' (hoje)';
+        } else if(diffDays <= 3){
+          statusClass = 'warning';
+          statusIcon = '⏳';
+          statusText = ' (em '+diffDays+' dias)';
+        } else {
+          statusClass = 'ok';
+          statusIcon = '✅';
+          statusText = ' (em '+diffDays+' dias)';
+        }
+        
+        tdEntrega.innerHTML = '<div class="delivery-date '+statusClass+'"><span>'+fmtDate(c.finalDue)+'</span><span class="delivery-icon">'+statusIcon+'</span><span style="font-size:11px;color:var(--muted)">'+statusText+'</span></div>';
+      }
+    } else {
+      tdEntrega.textContent = '—';
+    }
+    tr.appendChild(tdEntrega);
+    
+    // Coluna 6: Horas
+    var tdHoras = document.createElement('td');
+    tdHoras.textContent = c.horasProjeto ? c.horasProjeto + 'h' : '—';
+    tr.appendChild(tdHoras);
+    
+    // Coluna 7: Roadmap (Badge colorido)
+    var tdRoadmap = document.createElement('td');
+    if(c.roadMap){
+      var roadmapClass = '';
+      var roadmapIcon = '';
+      if(c.roadMap == 30){
+        roadmapClass = 'days-30';
+        roadmapIcon = '⚡';
+      } else if(c.roadMap == 60){
+        roadmapClass = 'days-60';
+        roadmapIcon = '🎯';
+      } else if(c.roadMap == 90){
+        roadmapClass = 'days-90';
+        roadmapIcon = '🕐';
+      }
+      tdRoadmap.innerHTML = '<span class="roadmap-badge '+roadmapClass+'">'+roadmapIcon+' '+c.roadMap+' dias</span>';
+    } else {
+      tdRoadmap.textContent = '—';
+    }
+    tr.appendChild(tdRoadmap);
+    
+    // Coluna 8: Progresso (Barra visual)
+    var tdProgress = document.createElement('td');
+    var newProgress = calculateCardProgress(c);
+    var progressPct = Math.round(newProgress * 100);
+    var progressClass = '';
+    
+    if(progressPct <= 30){
+      progressClass = 'critical';
+    } else if(progressPct <= 60){
+      progressClass = 'warning';
+    } else if(progressPct <= 90){
+      progressClass = 'info';
+    } else {
+      progressClass = 'success';
+    }
+    
+    tdProgress.innerHTML = '<div class="progress-wrapper"><div class="progress-bar"><div class="progress-fill '+progressClass+'" style="width:'+progressPct+'%"></div></div><span class="progress-text">'+progressPct+'%</span></div>';
+    tr.appendChild(tdProgress);
+    
+    tbody.appendChild(tr);
+  });
+}
+
+// ===== Sistema de Filtros =====
+var allCards = []; // Guardar todos os cards para filtrar
+
+function populateFilters(cards){
+  // Popular dropdown de Status
+  var statuses = new Set();
+  cards.forEach(function(c){
+    statuses.add(renderLabel(c.listKey));
+  });
+  var selectStatus = $('#filterStatus');
+  // Limpar opções existentes (exceto a primeira)
+  while(selectStatus.options.length > 1){
+    selectStatus.remove(1);
+  }
+  Array.from(statuses).sort().forEach(function(status){
+    var opt = document.createElement('option');
+    opt.value = status;
+    opt.textContent = status;
+    selectStatus.appendChild(opt);
+  });
+  
+  // Popular dropdown de Responsáveis
+  var responsaveis = new Set();
+  cards.forEach(function(c){
+    if(c.owner && c.owner !== '—') responsaveis.add(c.owner);
+  });
+  var selectResp = $('#filterResponsavel');
+  // Limpar opções existentes (exceto a primeira)
+  while(selectResp.options.length > 1){
+    selectResp.remove(1);
+  }
+  Array.from(responsaveis).sort().forEach(function(resp){
+    var opt = document.createElement('option');
+    opt.value = resp;
+    opt.textContent = resp;
+    selectResp.appendChild(opt);
+  });
+}
+
+function applyFilters(){
+  var filterStatus = $('#filterStatus').value;
+  var filterPUC = $('#filterPUC').value;
+  var filterResp = $('#filterResponsavel').value;
+  var filterRoadmap = $('#filterRoadmap').value;
+  var filterSearch = $('#filterSearch').value.toLowerCase();
+  
+  var filtered = allCards.filter(function(c){
+    // Filtro Status
+    if(filterStatus && renderLabel(c.listKey) !== filterStatus) return false;
+    
+    // Filtro PUC
+    if(filterPUC !== ''){
+      var cardLabel = (c.labels && c.labels.length > 0) ? c.labels[0].name : '';
+      if(filterPUC === '' && cardLabel !== '') return false; // Sem etiqueta
+      if(filterPUC !== '' && cardLabel !== filterPUC) return false;
+    }
+    
+    // Filtro Responsável
+    if(filterResp && c.owner !== filterResp) return false;
+    
+    // Filtro Roadmap
+    if(filterRoadmap && String(c.roadMap) !== filterRoadmap) return false;
+    
+    // Filtro Busca
+    if(filterSearch && c.name.toLowerCase().indexOf(filterSearch) === -1) return false;
+    
+    return true;
+  });
+  
+  renderProjects(filtered);
+}
+
+// Event listeners dos filtros
+$('#filterStatus').addEventListener('change', applyFilters);
+$('#filterPUC').addEventListener('change', applyFilters);
+$('#filterResponsavel').addEventListener('change', applyFilters);
+$('#filterRoadmap').addEventListener('change', applyFilters);
+$('#filterSearch').addEventListener('input', applyFilters);
+
+$('#btnClearFilters').addEventListener('click', function(){
+  $('#filterStatus').value = '';
+  $('#filterPUC').value = '';
+  $('#filterResponsavel').value = '';
+  $('#filterRoadmap').value = '';
+  $('#filterSearch').value = '';
+  applyFilters();
+});
+
+// ===== Processar JSON (comum para auto-load e upload manual) =====
+function processJSON(raw, source){
+  try{
+    logd('JSON parseado com sucesso (fonte: ' + source + ')');
+
+    var ingested = ingestTrello(raw);
+    logd('Cards válidos:', ingested.cards.length);
+    logd('Cards brutos:', ingested.rawOpenCount);
+
+    // Render Banco de Horas
+    renderBancoHoras(ingested.bancoHoras);
+
+    // Calcular e Render Roadmap
+    var roadmapData = calculateRoadmap(ingested.cards);
+    renderRoadmap(roadmapData);
+
+    // Calcular e Render PUC
+    var labelStats = calculateLabelStats(ingested.cards);
+    renderLabelStats(labelStats);
+
+    // Compute & Render
+    var metrics = compute(ingested.cards, ingested.rawOpenCount);
+    renderKpis(metrics);
+    renderKanbanGroup('distOut', ['Cancelado','Suspenso','Backlog','Revisão de projetos'], metrics.byOut);
+    renderKanbanGroup('distPre', ['Nova Demanda','Estudo Téc/RN','Levantamento de Esforço','Aprovação de Esforço'], metrics.byPre);
+    renderKanbanGroup('distExec', ['Debito Técnico','Planejamento','Cronograma','Construção da EF','Confirmação da EF (WTéc)','Validação EF','Pronto para DEV','Dev','QA Wittel','Certificação','Correções e Ajustes','Deploy'], metrics.byExec);
+    renderKanbanGroup('distCx', ['Acompanha Resultados'], metrics.byCx);
+    
+    // Guardar todos os cards para filtros e popular dropdowns
+    allCards = metrics.sorted;
+    populateFilters(allCards);
+    renderProjects(allCards);
+
+    setMsg('Dados carregados com sucesso • '+ingested.cards.length+' cards ativos', 'success');
+    $('#hdrStatus').textContent = 'Atualizado';
+    $('#hdrStatus').className = 'status-pill success';
+    
+    // Mostrar botão de recarregar e esconder upload
+    $('#btnReload').style.display = 'inline-block';
+    $('#fileWrap').style.display = 'none';
+  }catch(err){
+    console.error('Erro ao processar JSON:', err);
+    logd('ERRO:', err.message||err);
+    setMsg('Erro ao processar dados: ' + (err.message||'formato inválido'), 'error');
+    $('#hdrStatus').textContent = 'Erro';
+    $('#hdrStatus').className = 'status-pill error';
+  }
+}
+
+// ===== Auto-load do GitHub =====
+var DATA_URL = 'https://raw.githubusercontent.com/2025-labmichelin/produtos/main/data.json';
+
+function loadFromGitHub(){
+  setMsg('Carregando dados do GitHub...', '');
+  $('#hdrStatus').textContent = 'Carregando...';
+  $('#hdrStatus').className = 'status-pill';
+  
+  fetch(DATA_URL)
+    .then(function(response){
+      if(!response.ok){
+        throw new Error('HTTP ' + response.status);
+      }
+      return response.json();
+    })
+    .then(function(data){
+      processJSON(data, 'GitHub');
+    })
+    .catch(function(error){
+      console.error('Erro ao carregar do GitHub:', error);
+      logd('ERRO ao carregar do GitHub:', error.message||error);
+      setMsg('Não foi possível carregar dados automaticamente. Use o botão para carregar um arquivo local.', 'warn');
+      $('#hdrStatus').textContent = 'Falha';
+      $('#hdrStatus').className = 'status-pill warn';
+      
+      // Mostrar botão de upload manual
+      $('#fileWrap').style.display = 'block';
+      $('#btnReload').style.display = 'none';
+    });
+}
+
+// Carregar automaticamente ao abrir a página
+window.addEventListener('DOMContentLoaded', function(){
+  loadFromGitHub();
+});
+
+// Botão de recarregar
+$('#btnReload').addEventListener('click', function(){
+  loadFromGitHub();
+});
+
+// ===== Upload Manual (Fallback) =====
+document.getElementById('fileInput').addEventListener('change', function(e){
+  var file = e.target.files[0];
+  if(!file){return;}
+  
+  setMsg('Carregando arquivo local...', '');
+  $('#hdrStatus').textContent = 'Carregando...';
+  $('#hdrStatus').className = 'status-pill';
+  logd('Arquivo selecionado:', file.name);
+
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    try{
+      var text = ev.target.result;
+      text = text.replace(/^\uFEFF/, ''); // Remove BOM
+      var raw = JSON.parse(text);
+      processJSON(raw, 'arquivo local');
+    }catch(err){
+      console.error('Erro ao processar arquivo:', err);
+      logd('ERRO:', err.message||err);
+      setMsg('Erro ao processar arquivo: ' + (err.message||'formato inválido'), 'error');
+      $('#hdrStatus').textContent = 'Erro';
+      $('#hdrStatus').className = 'status-pill error';
+    }
+  };
+  reader.onerror = function(){
+    setMsg('Erro ao ler arquivo', 'error');
+    $('#hdrStatus').textContent = 'Erro';
+    $('#hdrStatus').className = 'status-pill error';
+    logd('Erro ao ler arquivo');
+  };
+  reader.readAsText(file);
+});
+
+// Self-tests
+(function selfTests(){
+  try{
+    logd('TEST: Iniciando testes...');
+    if(!document.getElementById('bancoHorasPanel')) logd('TEST FAIL: #bancoHorasPanel inexistente');
+    else logd('TEST OK: #bancoHorasPanel');
+    if(!document.getElementById('kpiTotal')) logd('TEST FAIL: #kpiTotal inexistente');
+    else logd('TEST OK: #kpiTotal');
+    logd('TEST: Testes concluídos');
+  }catch(err){
+    logd('TEST FAIL:', err.message||err);
+  }
+})();
+</script>
+</body>
+</html>
