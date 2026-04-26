@@ -293,4 +293,72 @@ export const phases: Phase[] = [
       },
     ],
   },
+  {
+    id: 5,
+    name: 'Bubba Gump',
+    emoji: '🚢',
+    theme: 'Implementação e Escala: do piloto à produção real',
+    questions: [
+      {
+        id: 1,
+        context: 'Sem um responsável formal pelos dados que alimentam um modelo de IA, os projetos são alimentados com dados inconsistentes, desatualizados ou fragmentados — e os modelos entregam resultados que refletem exatamente essa qualidade.',
+        question: 'Sua empresa tem um responsável formal pelos dados que alimentam cada modelo de IA em produção — um "Data Owner"?',
+        options: [
+          { letter: 'A', text: 'Não — os dados são de todos, o que na prática significa que não são de ninguém', points: 1 },
+          { letter: 'B', text: 'Informalmente sim, mas sem autoridade ou processo formal de qualidade', points: 2 },
+          { letter: 'C', text: 'Estamos definindo Data Owners por domínio, mas o processo ainda está sendo implementado', points: 3 },
+          { letter: 'D', text: 'Temos Data Owners formais por domínio com responsabilidades e métricas de qualidade definidas', points: 4 },
+        ],
+        feedback: 'Data Owner é um dos papéis mais negligenciados em estratégias de IA. Sem alguém formalmente responsável pela qualidade dos dados de um domínio — clientes, produtos, operação — os modelos são alimentados com dados inconsistentes. A boa notícia: não precisa de um Data Lake perfeito para começar. O MVDS permite iniciar com os dados estritamente necessários para o caso de uso prioritário e expandir com qualidade.',
+      },
+      {
+        id: 2,
+        context: 'Um chatbot que custa R$500/mês em piloto pode custar R$50.000/mês com volume real de usuários. O custo oculto de tokens em produção é uma das surpresas mais desagradáveis para empresas que escalam IA sem planejamento financeiro adequado.',
+        question: 'Sua empresa já calculou o custo real de operar modelos de IA em escala — incluindo tokens, infraestrutura, manutenção e atualização contínua?',
+        options: [
+          { letter: 'A', text: 'Não — o custo de IA ainda é visto como investimento pontual, sem projeção de escala', points: 1 },
+          { letter: 'B', text: 'Temos uma estimativa superficial, mas sem granularidade suficiente', points: 2 },
+          { letter: 'C', text: 'Já fizemos um cálculo mais detalhado, mas com gaps em alguns componentes', points: 3 },
+          { letter: 'D', text: 'Temos um modelo de custo total de propriedade (TCO) documentado e revisado periodicamente', points: 4 },
+        ],
+        feedback: 'Antes de escalar, calcule o custo por interação, projete o volume real e valide se o ROI ainda sustenta o investimento nessa escala. O custo de tokens cresce de forma não linear com o volume — e muitas empresas descobrem isso depois de aprovar o orçamento de expansão. Um TCO documentado transforma surpresas desagradáveis em decisões planejadas.',
+      },
+      {
+        id: 3,
+        context: 'Para cada modelo em produção, um Model Owner tem responsabilidade documentada: quem treinou, com quais dados, performance esperada, como monitorar e o que fazer quando algo der errado. Sem isso, um modelo degradado pode ficar meses em produção sem que ninguém perceba.',
+        question: 'Quando um modelo de IA em produção começa a entregar resultados abaixo do esperado, quem na sua empresa é responsável por identificar, investigar e corrigir o problema?',
+        options: [
+          { letter: 'A', text: 'Ninguém formalmente — cada um aponta para o outro', points: 1 },
+          { letter: 'B', text: 'TI cuida da parte técnica, mas o processo de negócio fica sem dono claro', points: 2 },
+          { letter: 'C', text: 'Existe alguma definição, mas o processo de resposta ainda é lento e reativo', points: 3 },
+          { letter: 'D', text: 'Temos um Model Owner por iniciativa com processo de resposta a incidentes documentado', points: 4 },
+        ],
+        feedback: 'Model Owner é um conceito simples e poderoso. Sem ele, um modelo degradado pode ficar meses em produção entregando resultado ruim — e quando alguém percebe, já é tarde para recuperar a confiança das equipes. O Model Card documenta tudo: quem é o responsável, quais dados foram usados, qual a performance esperada, como monitorar e qual o processo de escalação quando algo falha.',
+      },
+      {
+        id: 4,
+        context: 'Um modelo com 95% de precisão que ninguém usa entrega zero ROI. A taxa de adoção deve ser tratada como métrica de sucesso do projeto — não como consequência natural da implementação.',
+        question: 'Como sua empresa mede se as ferramentas de IA que foram implementadas estão sendo realmente usadas pelas equipes no dia a dia?',
+        options: [
+          { letter: 'A', text: 'Não medimos — assumimos que se foi implementado, está sendo usado', points: 1 },
+          { letter: 'B', text: 'Sabemos que há resistência, mas não temos métricas formais de adoção', points: 2 },
+          { letter: 'C', text: 'Acompanhamos uso de forma informal, mas sem KPIs de adoção definidos', points: 3 },
+          { letter: 'D', text: 'Adoção é KPI do projeto — medimos ativamente e agimos quando está abaixo da meta', points: 4 },
+        ],
+        feedback: 'Adoção é o KPI mais negligenciado em projetos de IA. O processo para garantir adoção real: comunique antes do lançamento, treine com foco em ganho prático por função, identifique champions internos que influenciam os colegas, e acompanhe ativamente nas primeiras semanas. O que não é medido não é gerenciado — e o que não é gerenciado não escala.',
+      },
+      {
+        id: 5,
+        context: 'Empresas no Nível 3 de maturidade em IA têm algo em comum: IA deixou de ser projeto de TI e virou capacidade estratégica de negócio. O CEO fala sobre IA nas reuniões de resultado. O cliente percebe a diferença na experiência.',
+        question: 'Olhando para onde sua empresa quer chegar com IA nos próximos 12 meses, qual frase melhor descreve a ambição?',
+        options: [
+          { letter: 'A', text: 'Sobreviver — queremos pelo menos não ficar para trás da concorrência', points: 1 },
+          { letter: 'B', text: 'Experimentar — queremos ter alguns casos de uso rodando e aprender com eles', points: 2 },
+          { letter: 'C', text: 'Operar — queremos IA integrada aos processos principais com ROI mensurável', points: 3 },
+          { letter: 'D', text: 'Liderar — queremos que IA seja um diferencial competitivo percebido pelo cliente e pelo mercado', points: 4 },
+        ],
+        feedback: 'Chegar ao Nível 3 não é questão de tecnologia — é questão de visão, consistência e vontade de construir as bases certas ao longo do caminho. O roteiro é claro: comece pelo problema de negócio, construa as bases de dados, envolva as pessoas desde o início, documente os processos antes de automatizá-los e estabeleça governança desde o primeiro modelo em produção.',
+      },
+    ],
+  },
 ]
