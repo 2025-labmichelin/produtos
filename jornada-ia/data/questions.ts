@@ -225,4 +225,72 @@ export const phases: Phase[] = [
       },
     ],
   },
+  {
+    id: 4,
+    name: 'Vietnam',
+    emoji: '🌿',
+    theme: 'Estratégia e Casos de Uso: IA que resolve problemas reais',
+    questions: [
+      {
+        id: 1,
+        context: 'A abordagem McKinsey começa sempre pelo problema, nunca pela ferramenta. Para cada dor, avalie se IA é realmente a melhor solução — ou se um processo redesenhado resolve mais rápido e mais barato.',
+        question: 'Como sua empresa identifica quais problemas de negócio são candidatos a uma solução com IA?',
+        options: [
+          { letter: 'A', text: 'Não temos um processo — as iniciativas surgem de forma reativa ou por pressão externa', points: 1 },
+          { letter: 'B', text: 'Discutimos oportunidades, mas sem critério formal de avaliação e priorização', points: 2 },
+          { letter: 'C', text: 'Usamos algum critério de impacto e viabilidade, mas ainda de forma informal', points: 3 },
+          { letter: 'D', text: 'Temos uma matriz formal de priorização com critérios de impacto, viabilidade e velocidade', points: 4 },
+        ],
+        feedback: 'O processo ideal tem quatro passos: mapeie as top 5 dores operacionais ou de receita; avalie se IA é a melhor solução para cada uma; defina o KPI de sucesso antes de iniciar; priorize usando a matriz Impacto × Viabilidade × Velocidade. Sem essa disciplina, qualquer ferramenta parece boa na apresentação e nenhuma entrega resultado mensurável em produção.',
+      },
+      {
+        id: 2,
+        context: 'Sumarização automática de interações é um dos quick wins de maior ROI em contact centers. Uma IA que transcreve a chamada, gera o resumo e preenche o CRM economiza de 15 a 20 minutos por agente por dia — em uma operação com 100 agentes, isso é mais de 25 horas de produtividade recuperadas diariamente.',
+        question: 'Qual dessas situações mais se parece com o que acontece na sua empresa após cada atendimento ao cliente?',
+        options: [
+          { letter: 'A', text: 'O agente preenche tudo manualmente no sistema — leva de 2 a 5 minutos por atendimento', points: 1 },
+          { letter: 'B', text: 'Temos alguma automação, mas o preenchimento ainda é em grande parte manual', points: 2 },
+          { letter: 'C', text: 'Parte do processo é automatizado, mas ainda há dependência humana significativa', points: 3 },
+          { letter: 'D', text: 'A sumarização e o preenchimento no CRM são automáticos — o agente só valida', points: 4 },
+        ],
+        feedback: 'O After Call Work manual é um dos maiores desperdícios operacionais em contact centers — e um dos mais fáceis de resolver com IA. Além do ganho de produtividade, a sumarização automática cria um histórico estruturado de interações que alimenta análises de CX, treinamento de novos agentes e melhoria contínua de processos. É um quick win de 30 a 45 dias com ROI mensurável desde o primeiro mês.',
+      },
+      {
+        id: 3,
+        context: 'A fragmentação de dados do cliente entre Marketing, Vendas, CS e Produto é uma das dores com maior score em diagnósticos de empresas brasileiras. Decisões críticas são tomadas sem contexto integrado — porque cada área tem seu pedaço da história, mas ninguém tem a visão completa.',
+        question: 'Na sua empresa, qual área tem a visão mais completa da jornada do cliente — desde o primeiro contato até o pós-venda?',
+        options: [
+          { letter: 'A', text: 'Nenhuma — cada área tem seu pedaço e raramente se integram', points: 1 },
+          { letter: 'B', text: 'O CRM centraliza alguma coisa, mas está longe de ser a fonte única de verdade', points: 2 },
+          { letter: 'C', text: 'Temos iniciativas de integração de dados, mas ainda há gaps importantes', points: 3 },
+          { letter: 'D', text: 'Existe uma visão unificada do cliente acessível em tempo real para todas as áreas relevantes', points: 4 },
+        ],
+        feedback: 'A solução começa com um CRM tratado como fonte única de verdade — não como repositório de vendas. Com IA nativa, ele vira motor de inteligência do cliente: prevê churn, identifica oportunidades de upsell, detecta padrões de insatisfação antes que impactem o NPS. Mas tudo isso depende de dados unificados. Integrar as fontes é a fundação; a IA é o que transforma essa fundação em vantagem competitiva.',
+      },
+      {
+        id: 4,
+        context: 'ROI documentado e comunicado para o board é um dos sinais mais claros de que uma empresa avançou do Nível 1 para o Nível 2 de maturidade em IA. Sem isso, os projetos ficam vulneráveis ao próximo corte de budget.',
+        question: 'Sua empresa sabe calcular e comunicar o ROI das iniciativas de IA para a liderança executiva?',
+        options: [
+          { letter: 'A', text: 'Não — os projetos existem, mas o ROI nunca foi calculado formalmente', points: 1 },
+          { letter: 'B', text: 'Tentamos, mas sem metodologia clara — os números variam dependendo de quem calcula', points: 2 },
+          { letter: 'C', text: 'Temos algumas métricas, mas ainda falta consistência na comunicação para o board', points: 3 },
+          { letter: 'D', text: 'Temos uma metodologia de ROI documentada e comunicamos resultados regularmente à liderança', points: 4 },
+        ],
+        feedback: 'O modelo é simples: defina o KPI antes de começar, meça durante, comunique após. Exemplos reais de KPIs mensuráveis: redução de X% no tempo médio de atendimento, deflexão de Y% de tickets simples, N horas recuperadas por semana, aumento de Z% na taxa de resolução no primeiro contato. Números concretos mantêm o budget vivo — e criam o ciclo virtuoso de mais investimento gerando mais resultado.',
+      },
+      {
+        id: 5,
+        context: '"Sem dono, o projeto para." Iniciativas de IA que dependem de um entusiasta individual são as primeiras a parar quando essa pessoa muda de área ou sai da empresa. Institucionalizar é o que transforma um projeto em uma capacidade permanente.',
+        question: 'O que acontece com as iniciativas de IA da sua empresa quando o principal defensor interno muda de área ou sai da empresa?',
+        options: [
+          { letter: 'A', text: 'O projeto para ou perde força rapidamente — depende demais de uma pessoa', points: 1 },
+          { letter: 'B', text: 'Fica em modo de manutenção — ninguém toca, mas ninguém encerra formalmente', points: 2 },
+          { letter: 'C', text: 'Existe alguma continuidade, mas sem o mesmo ritmo e prioridade', points: 3 },
+          { letter: 'D', text: 'A iniciativa sobrevive porque está institucionalizada — tem dono formal, processo e budget', points: 4 },
+        ],
+        feedback: 'Institucionalização é o que separa projetos de IA de capacidades de IA. Um projeto depende de uma pessoa. Uma capacidade tem dono formal com autoridade, budget garantido, processo documentado e métricas acompanhadas pela liderança. Esse é o salto do Nível 1 para o Nível 2 de maturidade — e é onde a maioria das empresas brasileiras ainda está travada.',
+      },
+    ],
+  },
 ]
