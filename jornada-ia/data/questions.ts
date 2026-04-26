@@ -1,5 +1,5 @@
 export interface Option {
-  letter: 'A' | 'B' | 'C' | 'D'
+  letter: string
   text: string
   points: number
 }
