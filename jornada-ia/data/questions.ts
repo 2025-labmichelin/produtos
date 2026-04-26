@@ -17,6 +17,7 @@ export interface Phase {
   name: string
   emoji: string
   theme: string
+  isSurprise?: boolean
   questions: Question[]
 }
 
@@ -429,4 +430,83 @@ export const phases: Phase[] = [
       },
     ],
   },
+  {
+    id: 7,
+    name: 'A Caixa de Chocolates',
+    emoji: '🍫',
+    theme: 'Fase surpresa: você chegou até aqui. Agora relaxa.',
+    isSurprise: true,
+    questions: [
+      {
+        id: 1,
+        context: '',
+        question: 'Seu CEO acabou de mandar um e-mail para toda a empresa dizendo que vocês vão "implementar IA em tudo até o fim do trimestre". O que você faz?',
+        options: [
+          { letter: 'A', text: 'Comemora — finalmente o board acordou!', points: 5 },
+          { letter: 'B', text: 'Respira fundo e agenda uma reunião para alinhar expectativas com dados reais', points: 5 },
+          { letter: 'C', text: 'Atualiza o LinkedIn discretamente enquanto pensa no próximo passo', points: 5 },
+          { letter: 'D', text: 'Manda o link desta plataforma para ele imediatamente', points: 5 },
+        ],
+        feedback: 'Se você chegou até aqui, já sabe que "implementar IA em tudo" sem problema definido, dados organizados e dono por iniciativa é o caminho mais rápido para o POC eterno. A resposta B é a mais corajosa — e a mais rara nas empresas brasileiras. A D é a mais esperta.',
+      },
+      {
+        id: 2,
+        context: '',
+        question: 'Qual dessas frases você já ouviu em uma reunião de board sobre IA? Seja honesto.',
+        options: [
+          { letter: 'A', text: 'Precisamos de uma estratégia de IA antes que nosso concorrente nos ultrapasse', points: 5 },
+          { letter: 'B', text: 'Isso não é só colocar o ChatGPT em tudo?', points: 5 },
+          { letter: 'C', text: 'E se a IA substituir todos os nossos colaboradores?', points: 5 },
+          { letter: 'D', text: 'Todas as anteriores — na mesma reunião, em menos de 20 minutos', points: 5 },
+        ],
+        feedback: 'A opção D é a resposta estatisticamente mais honesta. Cada uma dessas frases revela um estágio de AI Literacy diferente. A boa notícia: quem faz a pergunta B geralmente está a um bom workshop de entender a diferença entre automação, machine learning e IA generativa. Você já sabe essa diferença. Eles ainda não.',
+      },
+      {
+        id: 3,
+        context: '',
+        question: 'Você está apresentando sua estratégia de IA para a diretoria. Qual dessas situações mais se parece com o que acontece?',
+        options: [
+          { letter: 'A', text: 'Aprovação imediata — a diretoria já estava esperando por isso', points: 5 },
+          { letter: 'B', text: 'Perguntas sobre ROI que você consegue responder com dados reais', points: 5 },
+          { letter: 'C', text: '"Muito interessante, vamos colocar na pauta do próximo trimestre" — e nunca mais é mencionado', points: 5 },
+          { letter: 'D', text: 'Alguém pergunta se "isso não vai vazar nossos dados para a concorrência"', points: 5 },
+        ],
+        feedback: 'A opção C tem um nome técnico: death by postponement — o projeto que nunca morre mas nunca avança. A cura é simples: KPI definido antes de começar, baseline documentado e resultado mensurável em 90 dias. Sem isso, qualquer projeto vira pauta do próximo trimestre para sempre.',
+      },
+      {
+        id: 4,
+        context: '',
+        question: 'Qual desses perfis de colega você já encontrou na vida real quando o assunto é IA?',
+        options: [
+          { letter: 'A', text: 'O Entusiasta: "IA vai resolver TUDO — precisamos implementar AGORA!"', points: 5 },
+          { letter: 'B', text: 'O Cético: "Isso é modinha, daqui a pouco passa como passou o blockchain"', points: 5 },
+          { letter: 'C', text: 'O Paralisado: "Concordo que precisamos fazer algo, mas precisamos estudar mais antes"', points: 5 },
+          { letter: 'D', text: 'Todos os três — às vezes a mesma pessoa em dias diferentes', points: 5 },
+        ],
+        feedback: 'O Entusiasta precisa de estrutura. O Cético precisa de um caso de uso concreto com ROI comprovado. O Paralisado precisa de um prazo de 90 dias e um quick win para ganhar confiança. Você agora tem as ferramentas para lidar com os três. E se a opção D foi a sua resposta — bem-vindo ao mundo real da transformação digital.',
+      },
+      {
+        id: 5,
+        context: '',
+        question: 'Você completou a Jornada IA. O que melhor descreve o que você vai fazer com tudo que aprendeu?',
+        options: [
+          { letter: 'A', text: 'Vou compartilhar esta plataforma com pelo menos 3 pessoas que precisam ver isso', points: 5 },
+          { letter: 'B', text: 'Vou iniciar uma conversa sobre estratégia de IA na minha empresa esta semana', points: 5 },
+          { letter: 'C', text: 'Vou revisitar meu perfil de maturidade e definir um próximo passo concreto', points: 5 },
+          { letter: 'D', text: 'Vou fazer tudo acima — começa hoje', points: 5 },
+        ],
+        feedback: '"A vida é como uma caixa de chocolates — você nunca sabe o que vai encontrar." Forrest Gump não sabia o que viria a seguir. Mas ele sempre deu o próximo passo. Você concluiu a jornada. Agora é sua vez de correr. Run, leader, run. 🍫',
+      },
+    ],
+  },
 ]
+
+export default phases
+
+export function getPhase(id: number): Phase | undefined {
+  return phases.find(p => p.id === id)
+}
+
+export function getQuestion(phaseId: number, questionId: number): Question | undefined {
+  return getPhase(phaseId)?.questions.find(q => q.id === questionId)
+}
