@@ -157,4 +157,72 @@ export const phases: Phase[] = [
       },
     ],
   },
+  {
+    id: 3,
+    name: 'A Corrida',
+    emoji: '🪶',
+    theme: 'Trends 2026: o mundo já mudou. Sua empresa percebeu?',
+    questions: [
+      {
+        id: 1,
+        context: 'Segundo o Google Cloud, 52% dos executivos em organizações maduras já têm agentes de IA em produção orquestrando fluxos complexos. Agentes não respondem perguntas — eles entendem objetivos, fazem planos e executam ações.',
+        question: 'Você já ouviu falar em "agentes de IA" ou "agentic AI" no contexto corporativo?',
+        options: [
+          { letter: 'A', text: 'Nunca ouvi esse termo', points: 1 },
+          { letter: 'B', text: 'Já ouvi, mas não sei como se diferencia de um chatbot comum', points: 2 },
+          { letter: 'C', text: 'Entendo o conceito — sei que é IA que age de forma autônoma com objetivo definido', points: 3 },
+          { letter: 'D', text: 'Já trabalhei com ou estou avaliando implementar agentes de IA na empresa', points: 4 },
+        ],
+        feedback: 'Diferente de um chatbot que responde perguntas, um agente entende um objetivo, cria um plano e executa ações em múltiplos sistemas — CRM, calendário, e-mail — sem intervenção humana em cada passo. Essa é a maior mudança corporativa de 2026: a transição de IA que responde para IA que executa. 88% dos early adopters já reportam ROI positivo.',
+      },
+      {
+        id: 2,
+        context: 'O Google Cloud aponta que a oportunidade de 2026 é fundamentalmente humana: libertar as equipes do trabalho repetitivo para que possam focar no que só humanos fazem — criatividade, empatia e pensamento estratégico.',
+        question: 'Como você enxerga o papel do colaborador humano num ambiente onde agentes de IA executam tarefas repetitivas de forma autônoma?',
+        options: [
+          { letter: 'A', text: 'Ameaça — as pessoas vão perder espaço para as máquinas', points: 1 },
+          { letter: 'B', text: 'Incerto — não tenho clareza sobre o que muda no papel humano', points: 2 },
+          { letter: 'C', text: 'Oportunidade — o humano foca no estratégico enquanto a IA cuida do operacional', points: 3 },
+          { letter: 'D', text: 'Já estamos redesenhando funções e processos com essa lógica na empresa', points: 4 },
+        ],
+        feedback: 'O novo papel do colaborador não é executor — é orquestrador de inteligência. Ele define o objetivo, supervisiona o processo e toma as decisões que exigem julgamento humano. Empresas que comunicam essa visão com clareza para suas equipes — antes de implementar — colhem muito mais engajamento do que as que apresentam a IA como uma imposição.',
+      },
+      {
+        id: 3,
+        context: 'Uma "linha de montagem digital" é um sistema onde múltiplos agentes de IA trabalham em sequência para executar um processo de negócio completo — sem intervenção humana em cada etapa. O protocolo A2A do Google torna isso possível mesmo entre agentes de diferentes fornecedores.',
+        question: 'Sua empresa já discutiu como seria estruturada uma "linha de montagem digital" — processos de negócio rodando de ponta a ponta com agentes de IA orquestrados?',
+        options: [
+          { letter: 'A', text: 'Nunca discutimos isso formalmente', points: 1 },
+          { letter: 'B', text: 'O tema apareceu, mas ainda é muito abstrato para avançar', points: 2 },
+          { letter: 'C', text: 'Já temos conversas estruturadas sobre automação de processos end-to-end com IA', points: 3 },
+          { letter: 'D', text: 'Temos iniciativas concretas de orquestração de agentes em desenvolvimento ou produção', points: 4 },
+        ],
+        feedback: 'Qualificar leads, gerar propostas e agendar reuniões pode ser um fluxo end-to-end sem intervenção humana em cada passo. O humano define a estratégia e supervisiona os resultados. Esse é o modelo que está redefinindo produtividade nas empresas mais avançadas do mundo neste momento.',
+      },
+      {
+        id: 4,
+        context: 'O Google Cloud aponta que o upskilling de talentos será o maior driver de valor de negócio em 2026 — acima da tecnologia em si. Treinar pessoas em "como usar IA para ser 2x mais eficiente no meu trabalho específico" tem muito mais impacto do que treinamentos genéricos.',
+        question: 'Sua empresa tem uma estratégia de upskilling — capacitação contínua — focada em IA para os colaboradores?',
+        options: [
+          { letter: 'A', text: 'Não temos nenhum programa estruturado de capacitação em IA', points: 1 },
+          { letter: 'B', text: 'Algumas pessoas se capacitam por conta própria, sem incentivo ou estrutura formal', points: 2 },
+          { letter: 'C', text: 'Temos iniciativas pontuais, mas sem uma estratégia contínua e abrangente', points: 3 },
+          { letter: 'D', text: 'Temos um programa formal de AI upskilling com trilhas por função e nível de senioridade', points: 4 },
+        ],
+        feedback: 'Trilhas por função — vendas, atendimento, operações, liderança — têm muito mais adesão do que treinamentos genéricos sobre "o que é IA". A pergunta certa não é "o que é um LLM?" — é "como usar IA para ser mais eficiente no meu trabalho hoje?". Empresas que investem em upskilling estruturado agora estão construindo uma vantagem competitiva que levará anos para os concorrentes replicarem.',
+      },
+      {
+        id: 5,
+        context: 'Empresas que experimentam hoje com IA agêntica não estão apenas construindo ferramentas — estão construindo o expertise interno para gerenciar, governar e escalar essa capacidade. A curva de aprendizado é íngreme para quem começa depois.',
+        question: 'Olhando para as tendências de IA agêntica que você acabou de conhecer, qual frase melhor descreve onde sua empresa está?',
+        options: [
+          { letter: 'A', text: 'Ainda assistindo de fora — esse mundo de agentes parece distante da nossa realidade', points: 1 },
+          { letter: 'B', text: 'Começando a entender — estamos mapeando como isso se aplica ao nosso contexto', points: 2 },
+          { letter: 'C', text: 'Em movimento — já temos iniciativas concretas, mesmo que ainda em fase inicial', points: 3 },
+          { letter: 'D', text: 'Na liderança — somos early adopters e já colhemos ROI de iniciativas agênticas', points: 4 },
+        ],
+        feedback: 'A vantagem competitiva de 2027 está sendo construída agora, em 2026, por quem tem coragem de experimentar antes de ter certeza. Não é sobre ser o maior — é sobre ser o mais rápido em aprender. Cada experimento, mesmo os que não funcionam, constrói o conhecimento interno que vai diferenciar sua empresa no médio prazo.',
+      },
+    ],
+  },
 ]
