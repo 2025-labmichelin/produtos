@@ -361,4 +361,72 @@ export const phases: Phase[] = [
       },
     ],
   },
+  {
+    id: 6,
+    name: 'Tenente Dan',
+    emoji: '👨‍✈️',
+    theme: 'Governança, ROI e Maturidade: IA que sustenta, não só que impressiona',
+    questions: [
+      {
+        id: 1,
+        context: 'Quando o CEO para uma reunião e pede os dados antes de decidir, toda a empresa aprende que dados importam. Uma cultura data-driven não nasce de ferramentas — nasce de comportamento de liderança.',
+        question: 'Na sua empresa, as decisões estratégicas são tomadas com base em dados e evidências — ou ainda predomina o "feeling" e a experiência individual?',
+        options: [
+          { letter: 'A', text: 'Predomina o feeling — dados existem, mas raramente determinam as decisões', points: 1 },
+          { letter: 'B', text: 'Usamos dados para confirmar decisões já tomadas, não para tomá-las', points: 2 },
+          { letter: 'C', text: 'Dados influenciam as decisões, mas de forma inconsistente entre áreas e lideranças', points: 3 },
+          { letter: 'D', text: 'Decisões estratégicas são baseadas em dados confiáveis e acessíveis em tempo real', points: 4 },
+        ],
+        feedback: 'O papel da IA numa cultura data-driven é amplificar o que já existe: dashboards em tempo real, alertas automáticos de desvio e modelos preditivos só entregam valor quando a liderança já tem o hábito de ouvir os dados. Se a cultura ainda é baseada em feeling, a IA vai ser mais uma ferramenta ignorada. A transformação cultural e a transformação tecnológica precisam caminhar juntas — e a cultural sempre lidera.',
+      },
+      {
+        id: 2,
+        context: 'O ciclo correto de ROI em IA tem três momentos: antes — defina o KPI e o baseline atual; durante — monitore os indicadores em produção; depois — compare com o baseline e comunique para o board. Sem o baseline definido antes, qualquer número parece bom.',
+        question: 'Sua empresa usa uma metodologia consistente para calcular o ROI das iniciativas de IA — antes de iniciar e depois de entregar?',
+        options: [
+          { letter: 'A', text: 'Não — ROI de IA nunca foi calculado formalmente', points: 1 },
+          { letter: 'B', text: 'Estimamos ROI antes de começar, mas raramente medimos depois', points: 2 },
+          { letter: 'C', text: 'Calculamos antes e depois, mas sem metodologia padronizada entre projetos', points: 3 },
+          { letter: 'D', text: 'Temos uma metodologia documentada aplicada em todos os projetos, com revisão pós-implementação', points: 4 },
+        ],
+        feedback: 'Os KPIs mais mensuráveis em operações de atendimento: redução de TMA, aumento de FCR, deflexão de tickets, horas recuperadas por agente por dia. Esses números, medidos com rigor antes e depois, são o que transforma projetos de IA em investimentos justificados — e em argumento sólido para o próximo ciclo de budget.',
+      },
+      {
+        id: 3,
+        context: 'Um Centro de Excelência em IA (CoE) transforma o aprendizado de um projeto em capacidade organizacional — e impede que cada nova iniciativa comece do zero. O núcleo mínimo: um líder com autoridade, especialistas técnicos, processo de avaliação de casos de uso e uma biblioteca de boas práticas.',
+        question: 'Sua empresa tem ou está construindo um Centro de Excelência em IA (CoE) — uma estrutura formal para centralizar conhecimento, padrões e boas práticas de IA?',
+        options: [
+          { letter: 'A', text: 'Não — o conhecimento de IA está espalhado por pessoas em diferentes áreas sem estrutura central', points: 1 },
+          { letter: 'B', text: 'Temos pessoas referência em IA, mas sem estrutura formal de CoE', points: 2 },
+          { letter: 'C', text: 'Estamos construindo um CoE, mas ainda está em fase inicial de definição', points: 3 },
+          { letter: 'D', text: 'Temos um CoE funcionando com equipe, processos, padrões e roadmap definidos', points: 4 },
+        ],
+        feedback: 'O CoE não precisa começar grande — precisa começar com as perguntas certas: quem avalia novos casos de uso? Onde ficam documentadas as boas práticas? Como o aprendizado de um projeto alimenta os próximos? Empresas sem essa estrutura reinventam a roda a cada iniciativa, multiplicam custos e fragmentam o conhecimento. Com ela, cada projeto fica mais rápido, mais barato e mais seguro do que o anterior.',
+      },
+      {
+        id: 4,
+        context: 'Maturidade em IA não se mede por quantas ferramentas a empresa tem. Se mede por quatro dimensões: negócio (ROI documentado), dados (governados e confiáveis), pessoas (capacitadas e engajadas) e governança (estruturada e funcionando).',
+        question: 'Como sua empresa mede o nível de maturidade em IA — não só o que foi implementado, mas o impacto real gerado?',
+        options: [
+          { letter: 'A', text: 'Não medimos — sabemos que temos iniciativas, mas sem avaliação de maturidade', points: 1 },
+          { letter: 'B', text: 'Medimos por número de projetos ou ferramentas — não por impacto real', points: 2 },
+          { letter: 'C', text: 'Temos algumas métricas de impacto, mas sem um framework de maturidade formal', points: 3 },
+          { letter: 'D', text: 'Usamos um modelo de maturidade com indicadores de negócio, dados, pessoas e governança', points: 4 },
+        ],
+        feedback: 'Empresas no Nível 3 têm as quatro dimensões funcionando de forma integrada. É o ponto onde IA deixa de ser projeto e vira vantagem competitiva sustentável. Mas chegar lá exige saber onde se está hoje — com honestidade e com métricas. O framework de maturidade não é um julgamento: é um mapa. E mapas só são úteis quando você sabe onde está antes de decidir para onde ir.',
+      },
+      {
+        id: 5,
+        context: 'Esta é a última pergunta da jornada principal. O que você fizer com esse aprendizado nas próximas semanas vai dizer mais sobre o futuro da sua empresa do que qualquer ferramenta de IA.',
+        question: 'Depois de tudo que você explorou neste jogo, qual frase melhor descreve o que você vai levar como próximo passo concreto?',
+        options: [
+          { letter: 'A', text: 'Preciso entender melhor o tema antes de qualquer movimento', points: 1 },
+          { letter: 'B', text: 'Vou compartilhar o que aprendi com minha equipe e começar uma conversa', points: 2 },
+          { letter: 'C', text: 'Tenho clareza de pelo menos um problema que quero resolver com IA nos próximos 90 dias', points: 3 },
+          { letter: 'D', text: 'Estou pronto para estruturar um roadmap de IA para minha empresa com o que aprendi aqui', points: 4 },
+        ],
+        feedback: 'Você concluiu a Jornada do Executivo em IA. Passou pelo diagnóstico, pela alfabetização, pelos trends de 2026, pela estratégia, pela implementação e pela governança. Não existe resposta errada aqui — existe o próximo passo honesto. Qualquer movimento, por menor que seja, vale mais do que o plano perfeito que nunca sai do papel. O que vem a seguir é com você.',
+      },
+    ],
+  },
 ]
