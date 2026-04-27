@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import CustomCursor from "@/components/decorative/CustomCursor";
 
 export const metadata: Metadata = {
   title: "Jornada IA",
@@ -29,6 +30,9 @@ export default function RootLayout({
         <div className="app-content">
           {children}
         </div>
+
+        {/* Easter egg: cursor customizado (tênis esboço com lerp) */}
+        <CustomCursor />
       </body>
     </html>
   );
