@@ -233,8 +233,19 @@ body::before {
 }
 
 /* ── Cursor customizado ───────────────────────────────── */
-.custom-cursor-active {
-  cursor: none;
+/* Esconde cursor nativo em todos os elementos */
+.custom-cursor-active,
+.custom-cursor-active *:not(input):not(textarea):not(select):not(button):not(a):not(label) {
+  cursor: none !important;
+}
+/* Garante que elementos interativos restaurem o cursor nativo */
+.custom-cursor-active input,
+.custom-cursor-active textarea,
+.custom-cursor-active select,
+.custom-cursor-active button,
+.custom-cursor-active a,
+.custom-cursor-active label {
+  cursor: auto !important;
 }
 
 /* ── Utilitários tipográficos ─────────────────────────── */
