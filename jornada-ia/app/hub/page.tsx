@@ -1,8 +1,12 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { getMaturityProfile } from '@/lib/scoring'
 import { phases } from '@/data/questions'
+
+type Completion = { phase_id: number; total_points: number; maturity_profile: string | null; completed_at: string }
+type RankingEntry = { pos: number; name: string; points: number; isYou?: boolean }
 
 const PHASE_DESCRIPTIONS: Record<number, string> = {
   1: 'Descubra seu perfil de maturidade em IA',
@@ -28,9 +32,10 @@ export default async function HubPage() {
     .eq('user_id', user.id)
     .order('phase_id')
 
-  const completedPhaseIds = new Set((completions ?? []).map((c: any) => c.phase_id))
-  const totalPoints = (completions ?? []).reduce((sum: number, c: any) => sum + (c.total_points ?? 0), 0)
-  const phase1Completion = (completions ?? []).find((c: any) => c.phase_id === 1)
+  const rows = (completions ?? []) as Completion[]
+  const completedPhaseIds = new Set(rows.map(c => c.phase_id))
+  const totalPoints = rows.reduce((sum, c) => sum + (c.total_points ?? 0), 0)
+  const phase1Completion = rows.find(c => c.phase_id === 1)
   const maturityProfile = phase1Completion ? getMaturityProfile(phase1Completion.total_points) : null
 
   // Fase atual: primeira não concluída (excluindo surpresa se 1-6 não concluídas)
@@ -41,7 +46,7 @@ export default async function HubPage() {
     ?? (allMainDone && surprisePhase && !completedPhaseIds.has(surprisePhase.id) ? surprisePhase.id : null)
 
   // Ranking mock (em produção viria do Supabase)
-  const mockRanking = [
+  const mockRanking: RankingEntry[] = [
     { pos: 1, name: 'Jogador anônimo', points: 138 },
     { pos: 2, name: 'Jogador anônimo', points: 131 },
     { pos: 3, name: user.user_metadata?.name ?? 'Você', points: totalPoints, isYou: true },
@@ -70,7 +75,7 @@ export default async function HubPage() {
             </span>
           )}
           {avatarUrl
-            ? <img src={avatarUrl} alt={userName} style={{ width: 36, height: 36, borderRadius: '50%', border: '2px solid var(--color-primary)', objectFit: 'cover' }} />
+            ? <Image src={avatarUrl} alt={userName} width={36} height={36} style={{ borderRadius: '50%', border: '2px solid var(--color-primary)', objectFit: 'cover' }} />
             : <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-ui)', fontWeight: 700, color: '#fff', fontSize: 14 }}>{userName[0]?.toUpperCase()}</div>
           }
           <span style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)' }}>{userName}</span>
@@ -112,7 +117,7 @@ export default async function HubPage() {
                 const isCurrent = phase.id === currentPhaseId
                 const isLocked = !isDone && !isCurrent
                 const isSurprise = !!phase.isSurprise
-                const phaseCompletion = (completions ?? []).find((c: any) => c.phase_id === phase.id)
+                const phaseCompletion = rows.find(c => c.phase_id === phase.id)
 
                 return (
                   <div
@@ -272,13 +277,13 @@ export default async function HubPage() {
                     gap: 10,
                     padding: '8px 10px',
                     borderRadius: 8,
-                    background: (entry as any).isYou ? 'rgba(74,107,138,0.12)' : 'transparent',
-                    border: (entry as any).isYou ? '1.5px solid rgba(74,107,138,0.3)' : '1.5px solid transparent',
+                    background: entry.isYou ? 'rgba(74,107,138,0.12)' : 'transparent',
+                    border: entry.isYou ? '1.5px solid rgba(74,107,138,0.3)' : '1.5px solid transparent',
                   }}
                 >
-                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 700, color: (entry as any).isYou ? '#4A6B8A' : '#8B7355', minWidth: 20 }}>#{entry.pos}</span>
-                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: (entry as any).isYou ? '#4A6B8A' : 'var(--color-text)', flex: 1, fontWeight: (entry as any).isYou ? 700 : 400 }}>{entry.name}</span>
-                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, color: (entry as any).isYou ? '#4A6B8A' : '#8B7355' }}>{entry.points} pts</span>
+                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 700, color: entry.isYou ? '#4A6B8A' : '#8B7355', minWidth: 20 }}>#{entry.pos}</span>
+                  <span style={{ fontFamily: 'var(--font-body)', fontSize: 13, color: entry.isYou ? '#4A6B8A' : 'var(--color-text)', flex: 1, fontWeight: entry.isYou ? 700 : 400 }}>{entry.name}</span>
+                  <span style={{ fontFamily: 'var(--font-ui)', fontSize: 12, fontWeight: 700, color: entry.isYou ? '#4A6B8A' : '#8B7355' }}>{entry.points} pts</span>
                 </div>
               ))}
             </div>
