@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { getPhase } from '@/data/questions'
 import Link from 'next/link'
+import { SoundOnMount } from '@/components/game/SoundManager'
 
 export default async function PhaseIntroPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -35,6 +36,16 @@ export default async function PhaseIntroPage({ params }: { params: Promise<{ id:
   const alreadyCompleted = !!completion
   const maxPoints = phase.isSurprise ? 25 : 20
 
+  // Som de desbloqueio: fase 1 nunca tem predecessor; fases 2+ só toca na primeira visita
+  // (sem nenhuma resposta ainda nesta fase)
+  const { count: answeredInPhase } = await supabase
+    .from('question_answers')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .eq('phase_id', phaseId)
+
+  const isFirstVisit = !alreadyCompleted && (answeredInPhase ?? 0) === 0
+
   const phaseDescriptions: Record<number, string> = {
     1: 'Hora da verdade. 5 perguntas que revelam onde você realmente está no mapa da IA — sem filtro, sem julgamento. Seu perfil de maturidade sai daqui.',
     2: 'A IA não para. Nesta fase, você analisa como sua empresa responde à velocidade do mercado e onde estão os gargalos de adoção.',
@@ -47,6 +58,9 @@ export default async function PhaseIntroPage({ params }: { params: Promise<{ id:
 
   return (
     <div style={{ minHeight: '100vh', background: '#F5EDD8', display: 'flex', flexDirection: 'column' }}>
+
+      {/* Som de desbloqueio na primeira visita à fase */}
+      {isFirstVisit && <SoundOnMount type="unlock" />}
 
       {/* Header */}
       <header style={{ position: 'sticky', top: 0, zIndex: 50, background: 'rgba(245,237,216,0.95)', backdropFilter: 'blur(8px)', borderBottom: '1px solid rgba(212,168,83,0.2)', padding: '0 40px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

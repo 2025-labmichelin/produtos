@@ -4,6 +4,7 @@ import { useState, useTransition, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { saveAnswer, completePhase } from '@/app/actions/quiz'
 import type { Question, Option } from '@/data/questions'
+import { soundClick, soundComplete } from '@/components/game/SoundManager'
 
 interface QuestionCardProps {
   phase: { id: number; name: string; emoji: string; isSurprise?: boolean }
@@ -40,6 +41,7 @@ export default function QuestionCard({
 
   function handleSelect(option: Option) {
     if (isRevealed) return
+    soundClick()
     setSelected(option.letter)
     setPhasePoints(prev => prev + option.points)
     setIsRevealed(true)
@@ -61,6 +63,7 @@ export default function QuestionCard({
   function handleNext() {
     startTransition(async () => {
       if (isLastQuestion) {
+        soundComplete()
         await completePhase(phaseId)
         router.push(`/fase/${phaseId}/resultado`)
       } else {
