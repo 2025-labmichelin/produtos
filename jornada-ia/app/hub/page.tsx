@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import LogoutButton from '@/components/auth/LogoutButton'
 import { getMaturityProfile } from '@/lib/scoring'
 import { phases } from '@/data/questions'
 
@@ -79,6 +80,7 @@ export default async function HubPage() {
             : <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-ui)', fontWeight: 700, color: '#fff', fontSize: 14 }}>{userName[0]?.toUpperCase()}</div>
           }
           <span style={{ fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 600, color: 'var(--color-text)' }}>{userName}</span>
+          <LogoutButton />
         </div>
       </header>
 
