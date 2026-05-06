@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { getPhase } from '@/data/questions'
 import { getMaturityProfile, MAX_POINTS_PER_PHASE, MAX_POINTS_SURPRISE } from '@/lib/scoring'
 import Link from 'next/link'
+import CertificateSection from '@/components/game/CertificateSection'
 
 // ── Conteúdo dos perfis ──────────────────────────────────────────────────────
 
@@ -109,6 +110,21 @@ async function renderResultado(params: Promise<{ id: string }>) {
   // ── 6. Próxima fase ──────────────────────────────────────────────────────
   const nextPhaseId = phaseId < 7 ? phaseId + 1 : null
   const nextPhase = nextPhaseId ? getPhase(nextPhaseId) : null
+
+  // ── 7. Certificate_id (fases 6 e 7) ─────────────────────────────────────
+  let certificateUrl: string | null = null
+  if (phaseId === 6 || phaseId === 7) {
+    const { data: certRow } = await supabase
+      .from('phase_completions')
+      .select('certificate_id')
+      .eq('user_id', user.id)
+      .eq('phase_id', phaseId)
+      .single()
+    if (certRow?.certificate_id) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://produtos-pink.vercel.app'
+      certificateUrl = `${siteUrl}/certificado/${certRow.certificate_id}`
+    }
+  }
 
   // ── UI ───────────────────────────────────────────────────────────────────
   const barPos = maturityProfile ? barPosition(totalPhasePoints) : '0%'
@@ -394,6 +410,13 @@ async function renderResultado(params: Promise<{ id: string }>) {
               <p style={{ fontFamily: 'var(--font-body)', fontSize: 14, color: 'rgba(245,237,216,0.75)', margin: 0 }}>
                 Você concluiu todas as 7 fases. Parabéns — agora você sabe o que vai na caixa.
               </p>
+            </div>
+          )}
+
+          {/* ── Seção de certificado (fases 6 e 7) ── */}
+          {certificateUrl && (
+            <div style={{ animation: 'fadeUp 0.5s ease both', animationDelay: '0.28s' }}>
+              <CertificateSection certUrl={certificateUrl} />
             </div>
           )}
 
