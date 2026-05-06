@@ -42,7 +42,7 @@ export default function CertificateSection({ certUrl }: CertificateSectionProps)
             <div style={{
               fontFamily: 'var(--font-display)', fontSize: 20, fontWeight: 800, color: '#D4A853',
             }}>
-              Seu certificado está pronto!
+              Sua jornada está completa! 🍫
             </div>
           </div>
         </div>

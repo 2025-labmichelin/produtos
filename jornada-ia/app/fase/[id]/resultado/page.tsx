@@ -111,9 +111,9 @@ async function renderResultado(params: Promise<{ id: string }>) {
   const nextPhaseId = phaseId < 7 ? phaseId + 1 : null
   const nextPhase = nextPhaseId ? getPhase(nextPhaseId) : null
 
-  // ── 7. Certificate_id (fases 6 e 7) ─────────────────────────────────────
+  // ── 7. Certificate_id (apenas fase 7) ──────────────────────────────────
   let certificateUrl: string | null = null
-  if (phaseId === 6 || phaseId === 7) {
+  if (phaseId === 7) {
     const { data: certRow } = await supabase
       .from('phase_completions')
       .select('certificate_id')
