@@ -22,23 +22,29 @@ export async function saveAnswer(
 }
 
 export async function completePhase(phaseId: number) {
-  const supabase = await createServerSupabaseClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Unauthorized' }
+  try {
+    const supabase = await createServerSupabaseClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { error: 'Unauthorized' }
 
-  const { data: answers } = await supabase
-    .from('question_answers')
-    .select('points_earned')
-    .eq('user_id', user.id)
-    .eq('phase_id', phaseId)
+    const { data: answers } = await supabase
+      .from('question_answers')
+      .select('points_earned')
+      .eq('user_id', user.id)
+      .eq('phase_id', phaseId)
 
-  const totalPoints = answers?.reduce((sum, a) => sum + a.points_earned, 0) ?? 0
+    const totalPoints = answers?.reduce((sum, a) => sum + (a.points_earned ?? 0), 0) ?? 0
 
-  const { error } = await supabase.from('phase_completions').upsert(
-    { user_id: user.id, phase_id: phaseId, total_points: totalPoints },
-    { onConflict: 'user_id,phase_id' }
-  )
+    const { error } = await supabase.from('phase_completions').upsert(
+      { user_id: user.id, phase_id: phaseId, total_points: totalPoints },
+      { onConflict: 'user_id,phase_id' }
+    )
 
-  if (error) return { error: error.message }
-  return { success: true, totalPoints }
+    if (error) return { error: error.message }
+    return { success: true, totalPoints }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('[completePhase] thrown error:', msg, err)
+    return { error: `[thrown] ${msg}` }
+  }
 }

@@ -64,7 +64,11 @@ export default function QuestionCard({
     startTransition(async () => {
       if (isLastQuestion) {
         soundComplete()
-        await completePhase(phaseId)
+        try {
+          await completePhase(phaseId)
+        } catch (err) {
+          console.error('[handleNext] completePhase threw:', err)
+        }
         router.push(`/fase/${phaseId}/resultado`)
       } else {
         router.push(`/fase/${phaseId}/pergunta/${questionNum + 1}`)
