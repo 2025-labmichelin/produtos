@@ -29,26 +29,6 @@ function barPosition(pts: number) {
 }
 
 export default async function ResultadoPage({ params }: { params: Promise<{ id: string }> }) {
-  try {
-    return await renderResultado(params)
-  } catch (err) {
-    const isRedirect = typeof err === 'object' && err !== null &&
-      'digest' in err && String((err as { digest: string }).digest).startsWith('NEXT_REDIRECT')
-    if (isRedirect) throw err
-    const msg = err instanceof Error ? err.message : String(err)
-    const stack = err instanceof Error ? (err.stack ?? '') : ''
-    return (
-      <div style={{ padding: 40, fontFamily: 'monospace', background: '#F5EDD8', minHeight: '100vh' }}>
-        <h2 style={{ color: '#c00' }}>Erro na página de resultado (debug temporário)</h2>
-        <pre style={{ background: '#fff', padding: 16, borderRadius: 4, overflow: 'auto' }}>{msg}</pre>
-        <pre style={{ background: '#fff', padding: 16, borderRadius: 4, overflow: 'auto', fontSize: 11 }}>{stack}</pre>
-        <a href="/hub" style={{ color: '#3A3228' }}>← Voltar ao hub</a>
-      </div>
-    )
-  }
-}
-
-async function renderResultado(params: Promise<{ id: string }>) {
   const { id } = await params
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
