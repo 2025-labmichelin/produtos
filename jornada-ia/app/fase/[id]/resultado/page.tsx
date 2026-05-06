@@ -58,19 +58,18 @@ async function renderResultado(params: Promise<{ id: string }>) {
   if (!phase) redirect('/hub')
 
   // ── 1. Somar respostas da fase ───────────────────────────────────────────
-  const { data: answers } = await supabase
+  const { data: answers, error: answersError } = await supabase
     .from('question_answers')
     .select('question_id, option_letter, points_earned')
     .eq('user_id', user.id)
     .eq('phase_id', phaseId)
     .order('question_id')
 
-  const answeredCount = answers?.length ?? 0
-  const totalPhasePoints = answers?.reduce((s, a) => s + a.points_earned, 0) ?? 0
-  const maxPoints = phase.isSurprise ? MAX_POINTS_SURPRISE : MAX_POINTS_PER_PHASE
+  if (answersError) console.error('[resultado] question_answers error:', JSON.stringify(answersError))
 
-  // Se não respondeu nenhuma pergunta, redireciona para o início da fase
-  if (answeredCount === 0) redirect(`/fase/${phaseId}`)
+  const answeredCount = answers?.length ?? 0
+  const totalPhasePoints = answers?.reduce((s, a) => s + (a.points_earned ?? 0), 0) ?? 0
+  const maxPoints = phase.isSurprise ? MAX_POINTS_SURPRISE : MAX_POINTS_PER_PHASE
 
   // ── 2. Perfil de maturidade (fase 1) ────────────────────────────────────
   const maturityProfile = phaseId === 1 ? getMaturityProfile(totalPhasePoints) : null
