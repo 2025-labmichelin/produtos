@@ -1,5 +1,4 @@
 import { createAdminClient } from '@/lib/supabase-server'
-import { notFound } from 'next/navigation'
 import { MATURITY_PROFILES, MAX_POINTS_TOTAL } from '@/lib/scoring'
 import type { Metadata } from 'next'
 
