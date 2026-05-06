@@ -2,8 +2,8 @@ import { createServerSupabaseClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { getPhase } from '@/data/questions'
 import { getMaturityProfile, MAX_POINTS_PER_PHASE, MAX_POINTS_SURPRISE } from '@/lib/scoring'
-import Link from 'next/link'
 import CertificateSection from '@/components/game/CertificateSection'
+import ActionButtons from './ActionButtons'
 
 // ── Conteúdo dos perfis ──────────────────────────────────────────────────────
 
@@ -401,64 +401,11 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
           )}
 
           {/* ── Botões de ação ── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeUp 0.5s ease both', animationDelay: '0.3s' }}>
-
-            {/* Botão primário — Estilo A */}
-            {nextPhase && nextPhaseId && (
-              <Link
-                href={`/fase/${nextPhaseId}`}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '13px 26px',
-                  background: '#3A3228', color: '#F5EDD8',
-                  textDecoration: 'none',
-                  borderRadius: 4,
-                  border: 'none',
-                  outline: '3px solid #3A3228',
-                  outlineOffset: '3px',
-                  fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 700,
-                  letterSpacing: '0.07em',
-                  transition: 'background 0.15s ease, outline-offset 0.12s ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = '#5C4D3C';
-                  (e.currentTarget as HTMLAnchorElement).style.outlineOffset = '5px'
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = '#3A3228';
-                  (e.currentTarget as HTMLAnchorElement).style.outlineOffset = '3px'
-                }}
-              >
-                Avançar para {nextPhase.name} →
-              </Link>
-            )}
-
-            {/* Botão secundário */}
-            <Link
-              href="/hub"
-              style={{
-                display: 'inline-flex', alignItems: 'center',
-                padding: '13px 22px',
-                background: 'transparent',
-                color: '#5C4D3C',
-                textDecoration: 'none',
-                borderRadius: 4,
-                border: '1.5px solid #C8B88A',
-                fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 600,
-                letterSpacing: '0.06em',
-                transition: 'border-color 0.15s ease, color 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#8B6914';
-                (e.currentTarget as HTMLAnchorElement).style.color = '#3A3228'
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#C8B88A';
-                (e.currentTarget as HTMLAnchorElement).style.color = '#5C4D3C'
-              }}
-            >
-              Voltar ao hub
-            </Link>
+          <div style={{ animation: 'fadeUp 0.5s ease both', animationDelay: '0.3s' }}>
+            <ActionButtons
+              nextPhaseId={nextPhaseId ?? undefined}
+              nextPhaseName={nextPhase?.name}
+            />
           </div>
 
         </div>
