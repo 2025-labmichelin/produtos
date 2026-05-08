@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase-server'
 import { MATURITY_PROFILES, MAX_POINTS_TOTAL } from '@/lib/scoring'
+import LinkedInShareButton from '@/components/game/LinkedInShareButton'
 import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
@@ -339,10 +340,15 @@ export default async function CertificadoPage({
         <div style={{ height: 4, background: 'linear-gradient(90deg, #3A3228, #8B6914, #D4A853, #8B6914, #3A3228)' }} />
       </div>
 
+      {/* Botão LinkedIn */}
+      <div style={{ marginTop: 28 }}>
+        <LinkedInShareButton url={`${SITE_URL}/certificado/${id}`} />
+      </div>
+
       {/* Nota de verificação */}
       <p style={{
         fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic',
-        fontSize: 12, color: '#A89070', marginTop: 28, textAlign: 'center', maxWidth: 480,
+        fontSize: 12, color: '#A89070', marginTop: 20, textAlign: 'center', maxWidth: 480,
       }}>
         Este certificado é público e pode ser verificado por qualquer pessoa através deste link.
         O ID de verificação garante a autenticidade do documento.

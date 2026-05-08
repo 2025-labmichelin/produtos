@@ -1,6 +1,7 @@
 'use client'
 
 import CertificateQR from './CertificateQR'
+import LinkedInShareButton from './LinkedInShareButton'
 
 interface CertificateSectionProps {
   certUrl: string
@@ -117,6 +118,9 @@ export default function CertificateSection({ certUrl }: CertificateSectionProps)
                 </svg>
                 Imprimir certificado
               </button>
+
+              {/* LinkedIn */}
+              <LinkedInShareButton url={certUrl} />
             </div>
           </div>
         </div>
