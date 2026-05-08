@@ -4,10 +4,51 @@ import type { Metadata } from 'next'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateMetadata(): Promise<Metadata> {
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://produtos-pink.vercel.app'
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const admin = createAdminClient()
+
+  const { data: completion } = await admin
+    .from('phase_completions')
+    .select('user_id, total_points, maturity_profile')
+    .eq('certificate_id', id)
+    .single()
+
+  if (!completion) {
+    return { title: 'Certificado — Jornada IA' }
+  }
+
+  const { data: { user } } = await admin.auth.admin.getUserById(completion.user_id)
+  const { data: allCompletions } = await admin
+    .from('phase_completions')
+    .select('total_points')
+    .eq('user_id', completion.user_id)
+
+  const nome: string =
+    (user?.user_metadata?.full_name as string | undefined) ||
+    (user?.user_metadata?.name as string | undefined) ||
+    user?.email?.split('@')[0] ||
+    'Participante'
+
+  const totalPoints = allCompletions?.reduce((s, c) => s + c.total_points, 0) ?? completion.total_points
+  const profile = MATURITY_PROFILES.find(p => p.id === completion.maturity_profile)
+  const perfilLabel = profile ? profile.label : 'Jornada IA'
+
   return {
-    title: 'Certificado — Jornada IA',
-    description: 'Certificado de conclusão da Jornada IA para executivos.',
+    title: `${nome} concluiu a Jornada IA`,
+    description: `${nome} completou as 7 fases da Jornada IA com ${totalPoints} pontos e perfil "${perfilLabel}". Run, Leader, Run. 🍫`,
+    openGraph: {
+      title: `${nome} concluiu a Jornada IA 🍫`,
+      description: `Completou as 7 fases com ${totalPoints} pts`,
+      url: `${SITE_URL}/certificado/${id}`,
+      type: 'website',
+    },
   }
 }
 
