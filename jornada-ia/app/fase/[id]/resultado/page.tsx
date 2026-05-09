@@ -1,11 +1,11 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { getPhase } from '@/data/questions'
 import { getMaturityProfile, MAX_POINTS_PER_PHASE, MAX_POINTS_SURPRISE } from '@/lib/scoring'
 import CertificateSection from '@/components/game/CertificateSection'
 import ActionButtons from './ActionButtons'
 
-// ── Conteúdo dos perfis ──────────────────────────────────────────────────────
+// ── Conteúdo dos perfis ────────────────────────────────────────────
 
 const PROFILE_DESCRIPTIONS: Record<string, string> = {
   pena: 'Você está nos primeiros passos. A IA parece distante ou abstrata — e isso é completamente normal. O diferencial de quem evolui rápido é começar pelo problema, não pela ferramenta. Identifique um processo repetitivo na sua área e pergunte: tenho dados para automatizar isso?',
@@ -21,7 +21,7 @@ const PROFILE_INSIGHTS: Record<string, string> = {
   caixa: '"A vantagem competitiva real não está no modelo que você usa, mas em quão rápido você aprende e itera." Você está iterando ou só pilotando?',
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────
 
 function barPosition(pts: number) {
   // Escala 5–20 pts → 0–100%
@@ -38,7 +38,7 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
   const phase = getPhase(phaseId)
   if (!phase) redirect('/hub')
 
-  // ── 1. Somar respostas da fase ───────────────────────────────────────────
+  // ── 1. Somar respostas da fase ───────────────────────────────────────
   const { data: answers, error: answersError } = await supabase
     .from('question_answers')
     .select('question_id, option_letter, points_earned')
@@ -52,10 +52,10 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
   const totalPhasePoints = answers?.reduce((s, a) => s + (a.points_earned ?? 0), 0) ?? 0
   const maxPoints = phase.isSurprise ? MAX_POINTS_SURPRISE : MAX_POINTS_PER_PHASE
 
-  // ── 2. Perfil de maturidade (fase 1) ────────────────────────────────────
+  // ── 2. Perfil de maturidade (fase 1) ──────────────────────────────────
   const maturityProfile = phaseId === 1 ? getMaturityProfile(totalPhasePoints) : null
 
-  // ── 3. Upsert em phase_completions (com maturity_profile) ───────────────
+  // ── 3. Upsert em phase_completions (com maturity_profile) ─────────────────
   await supabase.from('phase_completions').upsert(
     {
       user_id: user.id,
@@ -74,8 +74,9 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
 
   const totalAccumulated = allCompletions?.reduce((s, c) => s + c.total_points, 0) ?? 0
 
-  // ── 5. Ranking geral ─────────────────────────────────────────────────────
-  const { data: rankingRows } = await supabase
+  // ── 5. Ranking geral ─────────────────────────────────────────────────
+  const admin = createAdminClient()
+  const { data: rankingRows } = await admin
     .from('phase_completions')
     .select('user_id, total_points')
 
@@ -87,11 +88,11 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
   const rankingPos = sortedTotals.findIndex(t => t <= totalAccumulated) + 1
   const totalParticipants = sortedTotals.length
 
-  // ── 6. Próxima fase ──────────────────────────────────────────────────────
+  // ── 6. Próxima fase ────────────────────────────────────────────────────
   const nextPhaseId = phaseId < 7 ? phaseId + 1 : null
   const nextPhase = nextPhaseId ? getPhase(nextPhaseId) : null
 
-  // ── 7. Certificate_id (apenas fase 7) ──────────────────────────────────
+  // ── 7. Certificate_id (apenas fase 7) ──────────────────────────────
   let certificateUrl: string | null = null
   if (phaseId === 7) {
     const { data: certRow } = await supabase
@@ -106,7 +107,7 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
     }
   }
 
-  // ── UI ───────────────────────────────────────────────────────────────────
+  // ── UI ────────────────────────────────────────────────────────────────────
   const barPos = maturityProfile ? barPosition(totalPhasePoints) : '0%'
 
   return (
@@ -433,4 +434,3 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
     </div>
   )
 }
-
