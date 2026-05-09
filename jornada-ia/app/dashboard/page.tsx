@@ -24,7 +24,7 @@ export default async function DashboardPage({
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/')
-  if (user.email !== process.env.NEXT_PUBLIC_OWNER_EMAIL) redirect('/hub')
+  if (user.email !== process.env.OWNER_EMAIL) redirect('/hub')
 
   const admin = createAdminClient()
 
@@ -32,7 +32,7 @@ export default async function DashboardPage({
     period === '7d'  ? new Date(Date.now() - 7  * 86400000).toISOString() :
     period === '30d' ? new Date(Date.now() - 30 * 86400000).toISOString() : null
 
-  // ── Fetch ───────────────────────────────────────────────────────────────────
+  // ── Fetch ───────────────────────────────────────────────────────────────────────────
   const { data: { users: allUsers } } = await admin.auth.admin.listUsers()
 
   const { data: rawCompletions } = cutoff
@@ -47,13 +47,13 @@ export default async function DashboardPage({
 
   const totalUsers = allUsers?.length ?? 0
 
-  // ── KPIs ────────────────────────────────────────────────────────────────────
+  // ── KPIs ──────────────────────────────────────────────────────────────────────────
   const uniqueStarted   = new Set(answers.map(a => a.user_id)).size
   const uniqueCompleted = new Set(completions.map(c => c.user_id)).size
   const completionRate  = uniqueStarted > 0 ? Math.round((uniqueCompleted / uniqueStarted) * 100) : 0
   const phase1Count     = completions.filter(c => c.phase_id === 1).length
 
-  // ── Funnel ──────────────────────────────────────────────────────────────────
+  // ── Funnel ────────────────────────────────────────────────────────────────────────
   const reachedPhase: Record<number, Set<string>> = {}
   for (const a of answers) {
     if (!reachedPhase[a.phase_id]) reachedPhase[a.phase_id] = new Set()
@@ -70,14 +70,14 @@ export default async function DashboardPage({
     if (drop > biggestDropValue) { biggestDropValue = drop; biggestDropPhase = i }
   }
 
-  // ── Donut: completaram vs só iniciaram ─────────────────────────────────────
+  // ── Donut: completaram vs só iniciaram ─────────────────────────────────────────────
   const donutR    = 52
   const donutC    = 2 * Math.PI * donutR
   const doneFrac  = uniqueStarted > 0 ? uniqueCompleted / uniqueStarted : 0
   const doneArc   = doneFrac * donutC
   const restArc   = donutC - doneArc
 
-  // ── Bar chart: últimos 7 dias ───────────────────────────────────────────────
+  // ── Bar chart: últimos 7 dias ────────────────────────────────────────────────────
   const sevenAgo = new Date(Date.now() - 7 * 86400000).toISOString()
   const answersFor7 = answers.filter(a => a.answered_at >= sevenAgo)
   const barData = Array.from({ length: 7 }, (_, i) => {
@@ -91,7 +91,7 @@ export default async function DashboardPage({
   })
   const maxBar = Math.max(...barData.map(d => d.count), 1)
 
-  // ── Profile distribution ────────────────────────────────────────────────────
+  // ── Profile distribution ────────────────────────────────────────────────────────
   const profileDist: Record<string, number> = {}
   for (const c of completions.filter(c => c.phase_id === 1)) {
     const p = getMaturityProfile(c.total_points)
@@ -105,7 +105,7 @@ export default async function DashboardPage({
   ].map(p => ({ ...p, count: profileDist[p.id] ?? 0 }))
   const maxProfile = Math.max(...profiles.map(p => p.count), 1)
 
-  // ── Média por fase ──────────────────────────────────────────────────────────
+  // ── Média por fase ────────────────────────────────────────────────────────────────
   const phaseStats: Record<number, { sum: number; count: number }> = {}
   for (const c of completions) {
     if (!phaseStats[c.phase_id]) phaseStats[c.phase_id] = { sum: 0, count: 0 }
@@ -113,7 +113,7 @@ export default async function DashboardPage({
     phaseStats[c.phase_id].count += 1
   }
 
-  // ── Top 5 ───────────────────────────────────────────────────────────────────
+  // ── Top 5 ─────────────────────────────────────────────────────────────────────────
   const userPoints: Record<string, number> = {}
   for (const c of completions) userPoints[c.user_id] = (userPoints[c.user_id] ?? 0) + c.total_points
   const top5 = Object.entries(userPoints)
@@ -121,7 +121,7 @@ export default async function DashboardPage({
     .slice(0, 5)
     .map(([uid, pts], i) => ({ pos: i + 1, pts, isYou: uid === user.id }))
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  // ── Render ────────────────────────────────────────────────────────────────────────
   const periodLabel =
     period === '7d'  ? 'Últimos 7 dias'  :
     period === '30d' ? 'Últimos 30 dias' : 'Todo o período'
@@ -270,7 +270,7 @@ export default async function DashboardPage({
         {/* Block 4: Bar chart — últimos 7 dias */}
         <div style={{ background: '#fff9f0', border: '1.5px solid #C8B88A', borderRadius: 10, boxShadow: '3px 3px 0px #C8B88A', padding: '24px 28px', marginBottom: 20 }}>
           <div style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 700, letterSpacing: '0.16em', color: '#8B6914', marginBottom: 20 }}>
-            RESPOSTAS — ÚLTIMOS 7 DIAS
+            RESPOSTAS — ÚTIMOS 7 DIAS
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, height: 140, paddingBottom: 32, position: 'relative' }}>
             {/* Y-axis guideline */}
