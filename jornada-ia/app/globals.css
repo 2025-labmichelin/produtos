@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── Google Fonts ────────────────────────────────────── */
+/* ── Google Fonts ──────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,800;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Raleway:wght@400;500;600;700&display=swap');
 
-/* ── Design Tokens ───────────────────────────────────── */
+/* ── Design Tokens ─────────────────────────────────── */
 :root {
   /* Cores */
   --color-primary:      #D4A853;
@@ -33,7 +33,7 @@
   --border-card:   1.5px solid rgba(212, 168, 83, 0.4);
 }
 
-/* ── Reset & Base ────────────────────────────────────── */
+/* ── Reset & Base ──────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -52,7 +52,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Textura de papel (linhas de caderno) ────────────── */
+/* ── Textura de papel (linhas de caderno) ──────────────── */
 body::before {
   content: '';
   position: fixed;
@@ -74,7 +74,7 @@ body::before {
   z-index: 1;
 }
 
-/* ── Mensagem desktop-only (< 1024px) ───────────────── */
+/* ── Mensagem desktop-only (< 1024px) ────────────────── */
 .mobile-warning {
   display: none;
 }
@@ -232,23 +232,8 @@ body::before {
   animation: featherFloat 6s ease-in-out infinite;
 }
 
-/* ── Cursor customizado ───────────────────────────────── */
-/* Esconde cursor nativo em todos os elementos */
-.custom-cursor-active,
-.custom-cursor-active *:not(input):not(textarea):not(select):not(button):not(a):not(label) {
-  cursor: none !important;
-}
-/* Garante que elementos interativos restaurem o cursor nativo */
-.custom-cursor-active input,
-.custom-cursor-active textarea,
-.custom-cursor-active select,
-.custom-cursor-active button,
-.custom-cursor-active a,
-.custom-cursor-active label {
-  cursor: auto !important;
-}
 
-/* ── Utilitários tipográficos ─────────────────────────── */
+/* ── Utilitários tipográficos ───────────────────────────── */
 .font-display { font-family: var(--font-display); }
 .font-body    { font-family: var(--font-body); }
 .font-ui      { font-family: var(--font-ui); }
