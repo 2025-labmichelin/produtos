@@ -1,10 +1,11 @@
-import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { createServerSupabaseClient, createAdminClient } from '@/lib/supabase-server'
 import { redirect } from 'next/navigation'
 import { getPhase } from '@/data/questions'
 import { getMaturityProfile, MAX_POINTS_PER_PHASE, MAX_POINTS_SURPRISE } from '@/lib/scoring'
-import Link from 'next/link'
+import CertificateSection from '@/components/game/CertificateSection'
+import ActionButtons from './ActionButtons'
 
-// ── Conteúdo dos perfis ──────────────────────────────────────────────────────
+// ── Conteúdo dos perfis ──────────────────────────────────────────────────
 
 const PROFILE_DESCRIPTIONS: Record<string, string> = {
   pena: 'Você está nos primeiros passos. A IA parece distante ou abstrata — e isso é completamente normal. O diferencial de quem evolui rápido é começar pelo problema, não pela ferramenta. Identifique um processo repetitivo na sua área e pergunte: tenho dados para automatizar isso?',
@@ -20,7 +21,7 @@ const PROFILE_INSIGHTS: Record<string, string> = {
   caixa: '"A vantagem competitiva real não está no modelo que você usa, mas em quão rápido você aprende e itera." Você está iterando ou só pilotando?',
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+// ── Helpers ──────────────────────────────────────────────────────
 
 function barPosition(pts: number) {
   // Escala 5–20 pts → 0–100%
@@ -37,25 +38,24 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
   const phase = getPhase(phaseId)
   if (!phase) redirect('/hub')
 
-  // ── 1. Somar respostas da fase ───────────────────────────────────────────
-  const { data: answers } = await supabase
+  // ── 1. Somar respostas da fase ───────────────────────────────────────────────
+  const { data: answers, error: answersError } = await supabase
     .from('question_answers')
     .select('question_id, option_letter, points_earned')
     .eq('user_id', user.id)
     .eq('phase_id', phaseId)
     .order('question_id')
 
+  if (answersError) console.error('[resultado] question_answers error:', JSON.stringify(answersError))
+
   const answeredCount = answers?.length ?? 0
-  const totalPhasePoints = answers?.reduce((s, a) => s + a.points_earned, 0) ?? 0
+  const totalPhasePoints = answers?.reduce((s, a) => s + (a.points_earned ?? 0), 0) ?? 0
   const maxPoints = phase.isSurprise ? MAX_POINTS_SURPRISE : MAX_POINTS_PER_PHASE
 
-  // Se não respondeu nenhuma pergunta, redireciona para o início da fase
-  if (answeredCount === 0) redirect(`/fase/${phaseId}`)
-
-  // ── 2. Perfil de maturidade (fase 1) ────────────────────────────────────
+  // ── 2. Perfil de maturidade (fase 1) ───────────────────────────────────
   const maturityProfile = phaseId === 1 ? getMaturityProfile(totalPhasePoints) : null
 
-  // ── 3. Upsert em phase_completions (com maturity_profile) ───────────────
+  // ── 3. Upsert em phase_completions (com maturity_profile) ─────────────────────
   await supabase.from('phase_completions').upsert(
     {
       user_id: user.id,
@@ -74,8 +74,9 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
 
   const totalAccumulated = allCompletions?.reduce((s, c) => s + c.total_points, 0) ?? 0
 
-  // ── 5. Ranking geral ─────────────────────────────────────────────────────
-  const { data: rankingRows } = await supabase
+  // ── 5. Ranking geral ───────────────────────────────────────────────────────
+  const admin = createAdminClient()
+  const { data: rankingRows } = await admin
     .from('phase_completions')
     .select('user_id, total_points')
 
@@ -87,11 +88,26 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
   const rankingPos = sortedTotals.findIndex(t => t <= totalAccumulated) + 1
   const totalParticipants = sortedTotals.length
 
-  // ── 6. Próxima fase ──────────────────────────────────────────────────────
+  // ── 6. Próxima fase ────────────────────────────────────────────────────────
   const nextPhaseId = phaseId < 7 ? phaseId + 1 : null
   const nextPhase = nextPhaseId ? getPhase(nextPhaseId) : null
 
-  // ── UI ───────────────────────────────────────────────────────────────────
+  // ── 7. Certificate_id (apenas fase 7) ──────────────────────────────
+  let certificateUrl: string | null = null
+  if (phaseId === 7) {
+    const { data: certRow } = await supabase
+      .from('phase_completions')
+      .select('certificate_id')
+      .eq('user_id', user.id)
+      .eq('phase_id', phaseId)
+      .single()
+    if (certRow?.certificate_id) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://produtos-pink.vercel.app'
+      certificateUrl = `${siteUrl}/certificado/${certRow.certificate_id}`
+    }
+  }
+
+  // ── UI ───────────────────────────────────────────────────────────────────────
   const barPos = maturityProfile ? barPosition(totalPhasePoints) : '0%'
 
   return (
@@ -378,65 +394,19 @@ export default async function ResultadoPage({ params }: { params: Promise<{ id: 
             </div>
           )}
 
+          {/* ── Seção de certificado (fases 6 e 7) ── */}
+          {certificateUrl && (
+            <div style={{ animation: 'fadeUp 0.5s ease both', animationDelay: '0.28s' }}>
+              <CertificateSection certUrl={certificateUrl} />
+            </div>
+          )}
+
           {/* ── Botões de ação ── */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 14, animation: 'fadeUp 0.5s ease both', animationDelay: '0.3s' }}>
-
-            {/* Botão primário — Estilo A */}
-            {nextPhase && nextPhaseId && (
-              <Link
-                href={`/fase/${nextPhaseId}`}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  padding: '13px 26px',
-                  background: '#3A3228', color: '#F5EDD8',
-                  textDecoration: 'none',
-                  borderRadius: 4,
-                  border: 'none',
-                  outline: '3px solid #3A3228',
-                  outlineOffset: '3px',
-                  fontFamily: 'var(--font-ui)', fontSize: 14, fontWeight: 700,
-                  letterSpacing: '0.07em',
-                  transition: 'background 0.15s ease, outline-offset 0.12s ease',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = '#5C4D3C';
-                  (e.currentTarget as HTMLAnchorElement).style.outlineOffset = '5px'
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLAnchorElement).style.background = '#3A3228';
-                  (e.currentTarget as HTMLAnchorElement).style.outlineOffset = '3px'
-                }}
-              >
-                Avançar para {nextPhase.name} →
-              </Link>
-            )}
-
-            {/* Botão secundário */}
-            <Link
-              href="/hub"
-              style={{
-                display: 'inline-flex', alignItems: 'center',
-                padding: '13px 22px',
-                background: 'transparent',
-                color: '#5C4D3C',
-                textDecoration: 'none',
-                borderRadius: 4,
-                border: '1.5px solid #C8B88A',
-                fontFamily: 'var(--font-ui)', fontSize: 13, fontWeight: 600,
-                letterSpacing: '0.06em',
-                transition: 'border-color 0.15s ease, color 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#8B6914';
-                (e.currentTarget as HTMLAnchorElement).style.color = '#3A3228'
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLAnchorElement).style.borderColor = '#C8B88A';
-                (e.currentTarget as HTMLAnchorElement).style.color = '#5C4D3C'
-              }}
-            >
-              Voltar ao hub
-            </Link>
+          <div style={{ animation: 'fadeUp 0.5s ease both', animationDelay: '0.3s' }}>
+            <ActionButtons
+              nextPhaseId={nextPhaseId ?? undefined}
+              nextPhaseName={nextPhase?.name}
+            />
           </div>
 
         </div>

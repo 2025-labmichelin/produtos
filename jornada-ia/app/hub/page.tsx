@@ -3,6 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import LogoutButton from '@/components/auth/LogoutButton'
+import ResetProgressButton from '@/components/game/ResetProgressButton'
 import { getMaturityProfile } from '@/lib/scoring'
 import { phases } from '@/data/questions'
 
@@ -291,6 +292,11 @@ export default async function HubPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Rodapé */}
+      <div style={{ textAlign: 'center', padding: '24px 0 40px' }}>
+        <ResetProgressButton userId={user.id} />
       </div>
     </div>
   )
