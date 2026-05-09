@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { isRedirectError } from 'next/dist/client/components/redirect'
 
 export default function Error({
   error,
@@ -9,6 +10,8 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  if (isRedirectError(error)) throw error
+
   useEffect(() => {
     console.error(error)
   }, [error])

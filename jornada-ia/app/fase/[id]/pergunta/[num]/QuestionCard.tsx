@@ -1,10 +1,21 @@
 'use client'
 
-import { useState, useTransition, useRef, useEffect } from 'react'
+import { useState, useTransition, useRef, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { saveAnswer, completePhase } from '@/app/actions/quiz'
 import type { Question, Option } from '@/data/questions'
 import { soundClick, soundComplete } from '@/components/game/SoundManager'
+
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const result = [...arr]
+  let s = seed
+  for (let i = result.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff
+    const j = Math.abs(s) % (i + 1);
+    [result[i], result[j]] = [result[j], result[i]]
+  }
+  return result
+}
 
 interface QuestionCardProps {
   phase: { id: number; name: string; emoji: string; isSurprise?: boolean }
@@ -31,6 +42,11 @@ export default function QuestionCard({
   const [isRevealed, setIsRevealed] = useState(existingAnswer !== null)
   const [phasePoints, setPhasePoints] = useState(currentPhasePoints)
   const feedbackRef = useRef<HTMLDivElement>(null)
+
+  const shuffledOptions = useMemo(
+    () => seededShuffle(question.options, phaseId * 1000 + question.id),
+    [question.options, phaseId, question.id]
+  )
 
   const isLastQuestion = questionNum === totalQuestions
   const maxPoints = phase.isSurprise ? 25 : 20
@@ -64,7 +80,11 @@ export default function QuestionCard({
     startTransition(async () => {
       if (isLastQuestion) {
         soundComplete()
-        await completePhase(phaseId)
+        try {
+          await completePhase(phaseId)
+        } catch (err) {
+          console.error('[handleNext] completePhase threw:', err)
+        }
         router.push(`/fase/${phaseId}/resultado`)
       } else {
         router.push(`/fase/${phaseId}/pergunta/${questionNum + 1}`)
@@ -235,7 +255,7 @@ export default function QuestionCard({
 
               {/* Opções */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                {question.options.map((option) => {
+                {shuffledOptions.map((option) => {
                   const isSelected = selected === option.letter
                   const isOther = isRevealed && !isSelected
 
