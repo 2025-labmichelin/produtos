@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { resetUserProgress } from '@/app/actions/reset'
 
 export default function ResetProgressButton({ userId }: { userId: string }) {
@@ -43,11 +44,11 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
         ↺ Recomeçar Histórico
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           onClick={() => setOpen(false)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 100,
+            position: 'fixed', inset: 0, zIndex: 9999,
             background: 'rgba(58,50,40,0.5)', backdropFilter: 'blur(4px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 24,
@@ -64,7 +65,6 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
               maxWidth: 420, width: '100%',
             }}
           >
-            {/* Título */}
             <h2 style={{
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: 22, fontWeight: 800, color: '#3A3228',
@@ -73,7 +73,6 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
               Tem certeza?
             </h2>
 
-            {/* Texto */}
             <p style={{
               fontFamily: "'Lora', Georgia, serif", fontStyle: 'italic',
               fontSize: 14, color: '#8B7355', lineHeight: 1.7,
@@ -83,7 +82,6 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
               Essa ação não pode ser desfeita.
             </p>
 
-            {/* Botões */}
             <div style={{ display: 'flex', gap: 12 }}>
               <button
                 onClick={handleConfirm}
@@ -142,7 +140,8 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
