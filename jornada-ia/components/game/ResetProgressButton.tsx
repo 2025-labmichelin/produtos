@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { createPortal } from 'react-dom'
 import { resetUserProgress } from '@/app/actions/reset'
 
 export default function ResetProgressButton({ userId }: { userId: string }) {
@@ -43,11 +44,11 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
         ↺ Recomeçar Histórico
       </button>
 
-      {open && (
+      {open && createPortal(
         <div
           onClick={() => setOpen(false)}
           style={{
-            position: 'fixed', inset: 0, zIndex: 100,
+            position: 'fixed', inset: 0, zIndex: 9999,
             background: 'rgba(58,50,40,0.5)', backdropFilter: 'blur(4px)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 24,
@@ -139,7 +140,8 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
