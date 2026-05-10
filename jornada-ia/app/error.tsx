@@ -13,7 +13,7 @@ export default function Error({
   if (isRedirectError(error)) throw error
 
   useEffect(() => {
-    console.error(error)
+    if (process.env.NODE_ENV === 'development') console.error(error)
   }, [error])
 
   return (
