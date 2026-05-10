@@ -19,14 +19,28 @@ export default function ResetProgressButton({ userId }: { userId: string }) {
       <button
         onClick={() => setOpen(true)}
         style={{
-          background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: '100%',
+          padding: '10px 16px',
+          background: 'transparent',
+          border: '1.5px solid rgba(192,57,43,0.5)',
+          borderRadius: 6,
+          cursor: 'pointer',
           fontFamily: 'Raleway, system-ui, sans-serif',
-          fontSize: 12, color: 'rgba(58,50,40,0.4)',
-          textDecoration: 'underline', textUnderlineOffset: 3,
-          letterSpacing: '0.04em',
+          fontSize: 12, fontWeight: 700, letterSpacing: '0.08em',
+          color: '#C0392B',
+          transition: 'background 0.15s ease, border-color 0.15s ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.background = 'rgba(192,57,43,0.1)'
+          e.currentTarget.style.borderColor = '#C0392B'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.background = 'transparent'
+          e.currentTarget.style.borderColor = 'rgba(192,57,43,0.5)'
         }}
       >
-        Recomeçar do zero
+        ↺ Recomeçar Histórico
       </button>
 
       {open && (
