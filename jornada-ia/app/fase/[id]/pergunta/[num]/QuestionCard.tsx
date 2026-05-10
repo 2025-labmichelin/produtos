@@ -11,8 +11,7 @@ function seededShuffle<T>(arr: T[], seed: number): T[] {
   let s = seed
   for (let i = result.length - 1; i > 0; i--) {
     s = (s * 1664525 + 1013904223) & 0xffffffff
-    const j = Math.abs(s) % (i + 1);
-    [result[i], result[j]] = [result[j], result[i]]
+    const j = Math.abs(s) % (i + 1);[result[i], result[j]] = [result[j], result[i]]
   }
   return result
 }
@@ -51,7 +50,6 @@ export default function QuestionCard({
   const isLastQuestion = questionNum === totalQuestions
   const maxPoints = phase.isSurprise ? 25 : 20
 
-  // Progresso: qts perguntas já respondidas (incluindo a atual se revealed)
   const answeredCount = isRevealed ? questionNum : questionNum - 1
   const progressPct = (answeredCount / totalQuestions) * 100
 
@@ -62,11 +60,10 @@ export default function QuestionCard({
     setPhasePoints(prev => prev + option.points)
     setIsRevealed(true)
     startTransition(async () => {
-      await saveAnswer(phaseId, question.id, option.letter, option.points)
+      await saveAnswer(phaseId, question.id, option.letter)
     })
   }
 
-  // Scroll suave para o feedback ao revelar
   useEffect(() => {
     if (isRevealed && existingAnswer === null && feedbackRef.current) {
       const timer = setTimeout(() => {
@@ -82,8 +79,8 @@ export default function QuestionCard({
         soundComplete()
         try {
           await completePhase(phaseId)
-        } catch (err) {
-          console.error('[handleNext] completePhase threw:', err)
+        } catch {
+          // error is non-critical: result page reads from DB directly
         }
         router.push(`/fase/${phaseId}/resultado`)
       } else {
@@ -156,7 +153,6 @@ export default function QuestionCard({
       {/* ── Barra de progresso ── */}
       <div style={{ background: 'rgba(245,237,216,0.6)', borderBottom: '1px solid rgba(212,168,83,0.1)', padding: '14px 40px' }}>
         <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          {/* Texto + dots */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
             <span style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 700, letterSpacing: '0.18em', color: '#8B6914' }}>
               PERGUNTA {questionNum} DE {totalQuestions}
@@ -183,7 +179,6 @@ export default function QuestionCard({
               })}
             </div>
           </div>
-          {/* Barra linear */}
           <div style={{ height: 3, background: 'rgba(200,184,138,0.3)', borderRadius: 2, overflow: 'hidden' }}>
             <div style={{
               height: '100%',
@@ -209,12 +204,10 @@ export default function QuestionCard({
             overflow: 'hidden',
             marginBottom: 20,
           }}>
-            {/* Barra gradiente no topo */}
             <div style={{ height: 5, background: 'linear-gradient(90deg, #D4A853 0%, #8B6914 55%, #3A3228 100%)' }} />
 
             <div style={{ padding: '28px 32px 32px' }}>
 
-              {/* Badge Q[num] + nome da fase */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 22 }}>
                 <div style={{
                   background: '#3A3228', borderRadius: 4,
@@ -229,7 +222,6 @@ export default function QuestionCard({
                 </span>
               </div>
 
-              {/* Caixa de contexto azul */}
               <div style={{
                 background: 'rgba(74,107,138,0.07)',
                 borderLeft: '3px solid #4A6B8A',
@@ -245,7 +237,6 @@ export default function QuestionCard({
                 </p>
               </div>
 
-              {/* Pergunta — Playfair Display Bold */}
               <h2 style={{
                 fontFamily: 'var(--font-display)', fontSize: 22, fontWeight: 700,
                 color: '#3A3228', lineHeight: 1.4, margin: '0 0 26px',
@@ -253,7 +244,6 @@ export default function QuestionCard({
                 {question.question}
               </h2>
 
-              {/* Opções */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 {shuffledOptions.map((option) => {
                   const isSelected = selected === option.letter
@@ -291,7 +281,6 @@ export default function QuestionCard({
                         e.currentTarget.style.transform = 'translate(0, 0)'
                       }}
                     >
-                      {/* Badge da letra */}
                       <div style={{
                         width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
                         background: isSelected ? '#D4A853' : 'transparent',
@@ -304,7 +293,6 @@ export default function QuestionCard({
                         {option.letter}
                       </div>
 
-                      {/* Texto da opção */}
                       <span style={{
                         fontFamily: 'var(--font-body)', fontSize: 14,
                         color: '#3A3228', lineHeight: 1.55, flex: 1, paddingTop: 3,
@@ -312,7 +300,6 @@ export default function QuestionCard({
                         {option.text}
                       </span>
 
-                      {/* +N pts (só na selecionada após reveal) */}
                       {isRevealed && isSelected && (
                         <div style={{
                           flexShrink: 0, alignSelf: 'center',
@@ -335,7 +322,6 @@ export default function QuestionCard({
           {isRevealed && (
             <div ref={feedbackRef} style={{ animation: 'fadeSlideIn 0.35s ease both' }}>
 
-              {/* Caixa de feedback */}
               <div style={{
                 background: '#FFFDF6',
                 borderLeft: '4px solid #D4A853',
@@ -358,7 +344,6 @@ export default function QuestionCard({
                 </p>
               </div>
 
-              {/* Botão próxima / ver resultado */}
               <button
                 onClick={handleNext}
                 disabled={isPending}
