@@ -291,12 +291,16 @@ export default async function HubPage() {
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Rodapé */}
-      <div style={{ textAlign: 'center', padding: '24px 0 40px' }}>
-        <ResetProgressButton userId={user.id} />
+          {/* Recomeçar histórico */}
+          <div style={{ background: 'rgba(192,57,43,0.06)', border: '1.5px solid rgba(192,57,43,0.25)', borderRadius: 14, padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#C0392B', marginBottom: 2, marginTop: 0, opacity: 0.8 }}>Zona de perigo</p>
+            <p style={{ fontFamily: 'var(--font-body)', fontStyle: 'italic', fontSize: 12, color: '#8B7355', margin: 0, lineHeight: 1.6 }}>
+              Apaga todo o seu progresso, pontuação e certificado. Irreversível.
+            </p>
+            <ResetProgressButton userId={user.id} />
+          </div>
+        </div>
       </div>
     </div>
   )
