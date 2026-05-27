@@ -16,13 +16,15 @@ const supabase = createClient(url, key, {
   auth: { autoRefreshToken: false, persistSession: false },
 })
 
-const { error } = await supabase
-  .from('phase_completions')
-  .select('*', { count: 'exact', head: true })
+;(async () => {
+  const { error } = await supabase
+    .from('phase_completions')
+    .select('*', { count: 'exact', head: true })
 
-if (error) {
-  console.error('keep-alive failed:', error.message)
-  process.exit(1)
-}
+  if (error) {
+    console.error('keep-alive failed:', error.message)
+    process.exit(1)
+  }
 
-console.log('keep-alive ok')
+  console.log('keep-alive ok')
+})()
